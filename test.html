@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script defer src="./node_modules/matter-js/build/matter.js"></script>
+    <script defer src="./index.js"></script>
+
+    <script>
+
+        window.addEventListener("load",function(){
+
+            let f = MatterTemplate.createFullMatterSimulation({
+                engine: {
+                    world: {
+                        bodies: []
+                    }
+                }
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+</body>
+</html>

@@ -1,0 +1,1 @@
+This is a JavaScript library that is used to make Matter.js simulations using a template.

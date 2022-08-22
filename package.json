@@ -1,0 +1,18 @@
+{
+  "name": "matter-template",
+  "version": "0.0.1-alpha",
+  "description": "Used to create Matter.js simulations given some template object",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "matter"
+  ],
+  "author": "Matthew Moczynski",
+  "license": "MIT",
+  "dependencies": {
+    "matter-js": "^0.18.0"
+  }
+}
