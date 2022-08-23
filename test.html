@@ -8,10 +8,20 @@
 
         window.addEventListener("load",function(){
 
-            let f = MatterTemplate.createFullMatterSimulation({
+            window.f = new MatterTemplate.Simulations.EngineRunnerRenderTriple({
                 engine: {
                     world: {
-                        bodies: []
+
+                        bodies: [
+
+                            {
+                                shape: "circle",
+                                x: 300,
+                                y: 300,
+                                radius: 100
+                            }
+
+                        ]
                     }
                 }
             });

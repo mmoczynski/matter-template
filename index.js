@@ -278,8 +278,8 @@ const MatterTemplate = {
          */
 
         EngineRunnerRenderTriple: function(template) {
-            MatterTemplate.Simulations.EngineRunnerPair.call(this,template.engine,template.runner);
-            this.render = Matter.Render.create(template.render);
+            MatterTemplate.Simulations.EngineRunnerPair.call(this,template);
+            this.render = Matter.Render.create();
         },
 
         /**
@@ -293,29 +293,6 @@ const MatterTemplate = {
         }
 
     },
-
-
-    /**
-	 * 
-	 * @param {SimulationTemplate} template 
-	 */
-
-	createFullMatterSimulation: function(template) {
-
-
-        let render = Matter.Render.create({
-            engine: engine,
-            ...template.render
-        })
-
-
-        return {
-            engine: engine,
-            render: render,
-            runner: runner
-        };
-
-	},
 
 };
 
