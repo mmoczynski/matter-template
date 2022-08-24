@@ -219,13 +219,23 @@ const MatterTemplate = {
 
         /**
          * 
-         * @param {EngineTemplate} engineTemplate 
+         * @param {EngineTemplate|BodyTemplate[]} engineTemplate 
          */
 
 		create: function(engineTemplate) {
-			let o = Matter.Engine.create(engineTemplate.options);
-            o.world = MatterTemplate.Composite.create(engineTemplate.world);
-            return o;
+
+            if(Array.isArray(engineTemplate)) {
+                return MatterTemplate.Engine.create({
+                    world: engineTemplate
+                })
+            }
+
+            else {
+                let o = Matter.Engine.create(engineTemplate.options);
+                o.world = MatterTemplate.Composite.create(engineTemplate.world);
+                return o;
+            }
+
 		},
 
         fullSimulation: function(engineTemplate) {
@@ -278,8 +288,27 @@ const MatterTemplate = {
          */
 
         EngineRunnerRenderTriple: function(template) {
+            
+            let self = this;
+
             MatterTemplate.Simulations.EngineRunnerPair.call(this,template);
-            this.render = Matter.Render.create();
+
+            this.render = Matter.Render.create({
+                element: document.body,
+                engine: self.engine,
+                ...template.render
+            });
+
+            this.run = function() {
+                Matter.Runner.run(self.engine);
+                Matter.Render.run(self.render);
+            }
+        },
+
+        stdSimulation: function(tempalte) {
+            return new MatterTemplate.Simulations.EngineRunnerRenderTriple({
+                
+            })
         },
 
         /**
