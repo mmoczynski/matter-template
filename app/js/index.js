@@ -3,9 +3,9 @@ import Renderer from "./src/render.js";
 import bootstrapModal from "./src/bsModal.js";
 import {alertModal,confirmModal,promptModal} from "./src/alertModal.js";
 
-function MatterTreeGui() {
+function MatterTreeGuiTab() {
 
-	let matterTreeGui = this;
+	let matterTreeGuiTab = this;
 
 	this.history = [];
 
@@ -13,9 +13,9 @@ function MatterTreeGui() {
 
 		set: function(target,string,value) {
 
-			matterTreeGui.newChanges = true;
+			matterTreeGuiTab.newChanges = true;
 			
-			matterTreeGui.history.push({
+			matterTreeGuiTab.history.push({
 				target: target,
 				property: string,
 				newValue: value,
@@ -31,63 +31,66 @@ function MatterTreeGui() {
 
 }
 
-MatterTreeGui.bootstrapModal = bootstrapModal;
-MatterTreeGui.alert = alertModal
-MatterTreeGui.confirm = confirmModal;
-MatterTreeGui.prompt = promptModal;
+MatterTreeGuiTab.bootstrapModal = bootstrapModal;
+MatterTreeGuiTab.alert = alertModal
+MatterTreeGuiTab.confirm = confirmModal;
+MatterTreeGuiTab.prompt = promptModal;
 
-window.MatterTreeGui = MatterTreeGui;
+window.MatterTreeGuiTab = MatterTreeGuiTab;
 
-MatterTreeGui.prototype.new = function() {
+MatterTreeGuiTab.prototype.new = function() {
 
 	let self = this;
 
-	new Promise(function(resolve,reject){
+	new Promise(function(resolve){
 		
 		if(self.newChanges) {
-			MatterTreeGui.confirm( "Are you sure you want to create a new project?",resolve,function(){
-				reject(1);
+			MatterTreeGuiTab.confirm("Are you sure you want to create a new project?", function(){
+				resolve(1)
+			},function(){
+				resolve(0);
 			})
-		
 		}
 
 		else {
-			resolve()
+			resolve(0)
 		}
 
-	}).then(function(){
+	}).then(function(value){
 
-		self.shapes = new Proxy([],{
+		if(value === 1) {
+
+			self.shapes = new Proxy([],{
 	
-			set: function(target,string,value) {
-					
-				self.history.push({
-					target: target,
-					property: string,
-					newValue: value,
-					oldValue: target[string]
-				});
-			
-				return target[string] = value;
-			}
-			
-		}); 
+				set: function(target,string,value) {
+						
+					self.history.push({
+						target: target,
+						property: string,
+						newValue: value,
+						oldValue: target[string]
+					});
+				
+					return target[string] = value;
+				}
+				
+			});
 
-		renderer.renderWorld(MatterTreeGui.currentInstance.shapes);
+		}
+ 
+		renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
 
-	}).catch(function(v){
-		console.log(v);
-	})
+	}).catch()
 
 
 }
 
-MatterTreeGui.prototype.open = function() {
+MatterTreeGuiTab.prototype.open = function() {
 
 	let self = this;
 
 	return new Promise(function(resolve,reject){
-		MatterTreeGui.confirm("Are you sure you want to open a file?", resolve, reject);
+		MatterTreeGuiTab.confirm("Are you sure you want to open a file?", resolve, reject);
 	}).then(function(){
 	
 		let m = document.createElement("input");
@@ -102,7 +105,7 @@ MatterTreeGui.prototype.open = function() {
 
 				fileReader.addEventListener("load",function(){
 					self.shapes = JSON.parse(fileReader.result);
-					renderer.renderWorld(MatterTreeGui.currentInstance.shapes);
+					renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
 				});
 
 				fileReader.readAsText(m.files[0])
@@ -118,7 +121,7 @@ MatterTreeGui.prototype.open = function() {
 
 }
 
-MatterTreeGui.prototype.save = function() {
+MatterTreeGuiTab.prototype.save = function() {
 
 	let self = this;
 
@@ -133,16 +136,24 @@ MatterTreeGui.prototype.save = function() {
 
 }
 
-MatterTreeGui.currentInstance = new MatterTreeGui();
+MatterTreeGuiTab.currentInstance = new MatterTreeGuiTab();
+
+function MatterTreeGuiEditor(container) {
+
+}
 
 // Toolbar
 
 document.querySelector(".action-save-file").addEventListener("click",function(){
-	MatterTreeGui.currentInstance.save();
+	MatterTreeGuiTab.currentInstance.save();
 });
 
 document.querySelector(".action-open-file").addEventListener("click",function(){
-	MatterTreeGui.currentInstance.open()
+	MatterTreeGuiTab.currentInstance.open()
+});
+
+document.querySelector(".action-new-file").addEventListener("click",function(){
+	MatterTreeGuiTab.currentInstance.new()
 });
 
 let canvas = document.createElement("canvas");
@@ -159,13 +170,13 @@ let polygonCreator = new PolygonCreator(canvas);
 polygonCreator.enable();
 
 polygonCreator.on("definePolygon",function(event){
-	MatterTreeGui.currentInstance.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-	renderer.renderWorld(MatterTreeGui.currentInstance.shapes);
+	MatterTreeGuiTab.currentInstance.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
+	renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
 });
 
 polygonCreator.on("pushVector",function(){
 	renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-	renderer.renderWorld(MatterTreeGui.currentInstance.shapes);
+	renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
 	renderer.renderVertices(polygonCreator.vertices);
 });
 
