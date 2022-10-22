@@ -157,7 +157,8 @@ const MatterTemplate = {
                 return MatterTemplate.Bodies.create({
                     shape: "vertices",
                     x: c.x,
-                    y: c.y
+                    y: c.y,
+                    vertexSets: bodyTemplate
                 });
 
             }
