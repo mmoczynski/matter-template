@@ -21,6 +21,12 @@ const MatterTemplate = {
 	Bodies: {
 
         /**
+         * @typedef Vector
+         * @property {Number} x
+         * @property {Number} y
+         */
+
+        /**
          * @typedef CircleTemplate
          * @property {Number} x - x-coordinate
          * @property {Number} y - y-coordinate
@@ -62,9 +68,14 @@ const MatterTemplate = {
          */
 
         /**
+         * @typedef {String} SVGVertices
+         * 
+         */
+
+        /**
          * 
          * @typedef {CircleTemplate|RectangleTemplate|
-         * PolygonTemplate|VerticesTemplate} BodyTemplate
+         * PolygonTemplate|VerticesTemplate|Vector[]|SVGVertices} BodyTemplate
          * 
          * 
          */
@@ -138,6 +149,40 @@ const MatterTemplate = {
 				);
 
 			}
+
+            if(Array.isArray(bodyTemplate)) {
+
+                let c = Matter.Vertices.centre(bodyTemplate);
+
+                return MatterTemplate.Bodies.create({
+                    shape: "vertices",
+                    x: c.x,
+                    y: c.y
+                });
+
+            }
+
+            if(typeof bodyTemplate === "string") {
+                
+                return MatterTemplate.Bodies.create(bodyTemplate.split(" ").map(
+                    
+                    function(o) {
+
+                        let a1 = o.split(",");
+
+                        return {
+                            x: Number.parseFloat(a1[0]),
+                            y: Number.parseFloat(a1[1])
+                        }
+
+                    }
+                
+                ))
+
+                
+
+            }
+
 		}
 
 	},
