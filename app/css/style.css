@@ -21,3 +21,24 @@ body, html {
 .modal {
     --bs-modal-bg: #333;
 }
+
+.ctrl-button {
+    display: inline-block;
+    background-color: #333;
+    padding: 10px;
+    margin: 10px;
+    font-size: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.ctrl-tools {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.main-nav {
+    position: absolute;
+    width: 100%;
+}

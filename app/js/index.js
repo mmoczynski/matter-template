@@ -3,9 +3,23 @@ import Renderer from "./src/render.js";
 import bootstrapModal from "./src/bsModal.js";
 import {alertModal,confirmModal,promptModal} from "./src/alertModal.js";
 
-function MatterTreeGuiTab() {
+let canvas = document.createElement("canvas");
+window.canvas = canvas;
 
-	let matterTreeGuiTab = this;
+canvas.id = "mattertree-gui-canvas";
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+document.body.appendChild(canvas);
+
+function MatterTemplateGuiTab() {
+
+	/**
+	 * @type {MatterTemplateGuiTab}
+	 */
+
+	this.parent = null;
+
+	let matterTemplateGuiTab = this;
 
 	this.history = [];
 
@@ -13,9 +27,9 @@ function MatterTreeGuiTab() {
 
 		set: function(target,string,value) {
 
-			matterTreeGuiTab.newChanges = true;
+			matterTemplateGuiTab.newChanges = true;
 			
-			matterTreeGuiTab.history.push({
+			matterTemplateGuiTab.history.push({
 				target: target,
 				property: string,
 				newValue: value,
@@ -31,21 +45,21 @@ function MatterTreeGuiTab() {
 
 }
 
-MatterTreeGuiTab.bootstrapModal = bootstrapModal;
-MatterTreeGuiTab.alert = alertModal
-MatterTreeGuiTab.confirm = confirmModal;
-MatterTreeGuiTab.prompt = promptModal;
+MatterTemplateGuiTab.bootstrapModal = bootstrapModal;
+MatterTemplateGuiTab.alert = alertModal
+MatterTemplateGuiTab.confirm = confirmModal;
+MatterTemplateGuiTab.prompt = promptModal;
 
-window.MatterTreeGuiTab = MatterTreeGuiTab;
+window.MatterTemplateGuiTab = MatterTemplateGuiTab;
 
-MatterTreeGuiTab.prototype.new = function() {
+MatterTemplateGuiTab.prototype.new = function() {
 
 	let self = this;
 
 	new Promise(function(resolve){
 		
 		if(self.newChanges) {
-			MatterTreeGuiTab.confirm("Are you sure you want to create a new project?", function(){
+			MatterTemplateGuiTab.confirm("Are you sure you want to create a new project?", function(){
 				resolve(1)
 			},function(){
 				resolve(0);
@@ -78,19 +92,19 @@ MatterTreeGuiTab.prototype.new = function() {
 
 		}
  
-		renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
+		renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 
 	}).catch()
 
 
 }
 
-MatterTreeGuiTab.prototype.open = function() {
+MatterTemplateGuiTab.prototype.open = function() {
 
 	let self = this;
 
 	return new Promise(function(resolve,reject){
-		MatterTreeGuiTab.confirm("Are you sure you want to open a file?", resolve, reject);
+		MatterTemplateGuiTab.confirm("Are you sure you want to open a file?", resolve, reject);
 	}).then(function(){
 	
 		let m = document.createElement("input");
@@ -105,7 +119,7 @@ MatterTreeGuiTab.prototype.open = function() {
 
 				fileReader.addEventListener("load",function(){
 					self.shapes = JSON.parse(fileReader.result);
-					renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
+					renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 				});
 
 				fileReader.readAsText(m.files[0])
@@ -121,7 +135,7 @@ MatterTreeGuiTab.prototype.open = function() {
 
 }
 
-MatterTreeGuiTab.prototype.save = function() {
+MatterTemplateGuiTab.prototype.save = function() {
 
 	let self = this;
 
@@ -136,33 +150,144 @@ MatterTreeGuiTab.prototype.save = function() {
 
 }
 
-MatterTreeGuiTab.currentInstance = new MatterTreeGuiTab();
+MatterTemplateGuiTab.prototype.export = function() {
 
-function MatterTreeGuiEditor(container) {
+	let self = this;
+
+    let a = document.createElement("a");
+    a.download = "Untitled.js";
+
+    a.href = URL.createObjectURL(new Blob([self.generateVertexCode()],{
+        type: "application/js"
+    }));
+
+    a.click();
+}
+
+MatterTemplateGuiTab.prototype.generateVertexCode = function() {
+
+	let txt = "let composite = Matter.composite.create();\n\n";
+	
+	txt = txt + "let shapes = [];\n\n";
+
+	for(var i = 0; i < this.shapes.length; i++) {
+		let c = Matter.Vertices.centre(this.shapes[i]);
+		txt = txt + `shapes[${i}] = Matter.Bodies.fromVertices(${c.x},${c.y},${JSON.stringify(this.shapes[i])});` + "\n\n";
+		txt = txt + `Matter.composite.add(composite,shapes[${i}]);\n\n`;
+	}
+	
+
+	return txt;
+}
+
+function MatterTemplateGui(container) {
+
+	let matterTemplateGui = this;
+	
+	this.currentTab = new MatterTemplateGuiTab();
+	this.currentTab.parent = this;
+	this.tabs = [this.currentTab];
+
+	// Toolbar
+
+	container.querySelector(".action-save-file").addEventListener("click",function(){
+		matterTemplateGui.currentTab.save();
+	});
+
+	container.querySelector(".action-open-file").addEventListener("click",function(){
+		matterTemplateGui.currentTab.open()
+	});
+
+	container.querySelector(".action-new-file").addEventListener("click",function(){
+		matterTemplateGui.currentTab.new()
+	});
+
+	container.querySelector(".action-export").addEventListener("click",function(){
+		matterTemplateGui.currentTab.export()
+	});
+
+	container.querySelector(".wireframe-run").addEventListener("click",function() {
+
+		sim_playing = true;
+	
+		let toggle = document.createElement("span");
+		let reset = document.createElement("span");
+		let exit = document.createElement("span");
+	
+		toggle.className = "bi bi-pause-fill toggle-button ctrl-button";
+		reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
+		exit.className = "bi bi-x exit-button ctrl-button";
+	
+		let tools = document.createElement("span");
+		tools.className = "ctrl-tools";
+		tools.append(toggle,reset,exit);
+		container.appendChild(tools);
+	
+		window.s = MatterTemplate.Engine.create(matterTemplateGui.currentTab.shapes);
+	
+	
+		toggle.addEventListener("click",function(){
+	
+			if(sim_playing) {
+				toggle.classList.remove("bi-pause-fill");
+				toggle.classList.add("bi-play-fill");
+			}
+	
+			else {
+				toggle.classList.remove("bi-play-fill");
+				toggle.classList.add("bi-pause-fill");
+			}
+	
+			sim_playing = !sim_playing;
+	
+			render_matter_simulation();
+	
+		});
+	
+	
+		reset.addEventListener("click",function(){
+			Matter.Composite.clear(window.s.world,true,true);
+			window.s = MatterTemplate.Engine.create(matterTemplateGui.currentTab.shapes);
+		});
+	
+		exit.addEventListener("click",function(){
+			Matter.Composite.clear(window.s.world,true,true);
+			clearInterval(interval_id);
+			window.s = null;
+			renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+			container.removeChild(tools);
+		});
+	
+		interval_id = setInterval(function(){
+	
+			renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+	
+			renderer.ctx.strokeStyle = "#555";
+	
+			renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+	
+			renderer.ctx.strokeStyle = "white";
+	
+			if(sim_playing) {
+				Matter.Engine.update(window.s);
+			}
+	
+			if(polygonCreator.vertices.length) {
+				renderer.renderVertices(polygonCreator.vertices);
+			}
+	
+			render_matter_simulation();
+	
+		},16.666);
+	
+	});
 
 }
 
-// Toolbar
+let matterTemplateGui = new MatterTemplateGui(document.body);
+MatterTemplateGuiTab.currentInstance = matterTemplateGui.currentTab;
 
-document.querySelector(".action-save-file").addEventListener("click",function(){
-	MatterTreeGuiTab.currentInstance.save();
-});
-
-document.querySelector(".action-open-file").addEventListener("click",function(){
-	MatterTreeGuiTab.currentInstance.open()
-});
-
-document.querySelector(".action-new-file").addEventListener("click",function(){
-	MatterTreeGuiTab.currentInstance.new()
-});
-
-let canvas = document.createElement("canvas");
-window.canvas = canvas;
-
-canvas.id = "mattertree-gui-canvas";
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-document.body.appendChild(canvas);
+window.matterTemplateGui = matterTemplateGui;
 
 // Polygon Creator
 
@@ -170,14 +295,25 @@ let polygonCreator = new PolygonCreator(canvas);
 polygonCreator.enable();
 
 polygonCreator.on("definePolygon",function(event){
-	MatterTreeGuiTab.currentInstance.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-	renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
+	MatterTemplateGuiTab.currentInstance.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
+	renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
+
+	if(sim_playing) {
+		render_matter_simulation();
+	}
+
 });
 
 polygonCreator.on("pushVector",function(){
+
 	renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-	renderer.renderWorld(MatterTreeGuiTab.currentInstance.shapes);
+	renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 	renderer.renderVertices(polygonCreator.vertices);
+
+	if(sim_playing) {
+		render_matter_simulation();
+	}
+
 });
 
 // Renderer
@@ -185,3 +321,19 @@ polygonCreator.on("pushVector",function(){
 let renderer = new Renderer(canvas);
 
 window.polygonCreator = polygonCreator;
+
+let sim_playing = false;
+
+function render_matter_simulation() {
+
+	window.s.world.bodies.forEach(function(o){
+	
+		o.parts.forEach(function(p){
+			renderer.renderVertices(p.vertices)
+		});
+
+	});
+
+}
+
+let interval_id;
