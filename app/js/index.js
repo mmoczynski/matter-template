@@ -183,10 +183,36 @@ MatterTemplateGuiTab.prototype.generateVertexCode = function() {
 function MatterTemplateGui(container) {
 
 	let matterTemplateGui = this;
-	
+
 	this.currentTab = new MatterTemplateGuiTab();
 	this.currentTab.parent = this;
 	this.tabs = [this.currentTab];
+
+	let polygonCreator = new PolygonCreator(canvas);
+
+	polygonCreator.enable();
+
+	polygonCreator.on("definePolygon",function(event){
+		matterTemplateGui.currentTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
+		renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+
+		if(sim_playing) {
+			render_matter_simulation();
+		}
+
+	});
+
+	polygonCreator.on("pushVector",function(){
+
+		renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+		renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+		renderer.renderVertices(polygonCreator.vertices);
+
+		if(sim_playing) {
+			render_matter_simulation();
+		}
+
+	});
 
 	// Toolbar
 
@@ -289,38 +315,9 @@ MatterTemplateGuiTab.currentInstance = matterTemplateGui.currentTab;
 
 window.matterTemplateGui = matterTemplateGui;
 
-// Polygon Creator
-
-let polygonCreator = new PolygonCreator(canvas);
-polygonCreator.enable();
-
-polygonCreator.on("definePolygon",function(event){
-	MatterTemplateGuiTab.currentInstance.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-	renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
-
-	if(sim_playing) {
-		render_matter_simulation();
-	}
-
-});
-
-polygonCreator.on("pushVector",function(){
-
-	renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-	renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
-	renderer.renderVertices(polygonCreator.vertices);
-
-	if(sim_playing) {
-		render_matter_simulation();
-	}
-
-});
-
 // Renderer
 
 let renderer = new Renderer(canvas);
-
-window.polygonCreator = polygonCreator;
 
 let sim_playing = false;
 
