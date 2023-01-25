@@ -92,7 +92,7 @@ MatterTemplateGuiTab.prototype.new = function() {
 
 		}
  
-		renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
+		self.parent.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 
 	}).catch()
 
@@ -119,7 +119,7 @@ MatterTemplateGuiTab.prototype.open = function() {
 
 				fileReader.addEventListener("load",function(){
 					self.shapes = JSON.parse(fileReader.result);
-					renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
+					self.parent.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 				});
 
 				fileReader.readAsText(m.files[0])
@@ -188,13 +188,33 @@ function MatterTemplateGui(container) {
 	this.currentTab.parent = this;
 	this.tabs = [this.currentTab];
 
+	let interval_id;
+
+	// Renderer
+
+	matterTemplateGui.renderer = new Renderer(canvas);
+
+	let sim_playing = false;
+
+	function render_matter_simulation() {
+
+		window.s.world.bodies.forEach(function(o){
+		
+			o.parts.forEach(function(p){
+				matterTemplateGui.renderer.renderVertices(p.vertices)
+			});
+
+		});
+
+	}
+
 	let polygonCreator = new PolygonCreator(canvas);
 
 	polygonCreator.enable();
 
 	polygonCreator.on("definePolygon",function(event){
 		matterTemplateGui.currentTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-		renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
 
 		if(sim_playing) {
 			render_matter_simulation();
@@ -204,9 +224,9 @@ function MatterTemplateGui(container) {
 
 	polygonCreator.on("pushVector",function(){
 
-		renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-		renderer.renderWorld(matterTemplateGui.currentTab.shapes);
-		renderer.renderVertices(polygonCreator.vertices);
+		matterTemplateGui.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+		matterTemplateGui.renderer.renderVertices(polygonCreator.vertices);
 
 		if(sim_playing) {
 			render_matter_simulation();
@@ -280,26 +300,26 @@ function MatterTemplateGui(container) {
 			Matter.Composite.clear(window.s.world,true,true);
 			clearInterval(interval_id);
 			window.s = null;
-			renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+			matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
 			container.removeChild(tools);
 		});
 	
 		interval_id = setInterval(function(){
 	
-			renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+			matterTemplateGui.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
 	
-			renderer.ctx.strokeStyle = "#555";
+			matterTemplateGui.renderer.ctx.strokeStyle = "#555";
 	
-			renderer.renderWorld(matterTemplateGui.currentTab.shapes);
+			matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
 	
-			renderer.ctx.strokeStyle = "white";
+			matterTemplateGui.renderer.ctx.strokeStyle = "white";
 	
 			if(sim_playing) {
 				Matter.Engine.update(window.s);
 			}
 	
 			if(polygonCreator.vertices.length) {
-				renderer.renderVertices(polygonCreator.vertices);
+				matterTemplateGui.renderer.renderVertices(polygonCreator.vertices);
 			}
 	
 			render_matter_simulation();
@@ -314,23 +334,3 @@ let matterTemplateGui = new MatterTemplateGui(document.body);
 MatterTemplateGuiTab.currentInstance = matterTemplateGui.currentTab;
 
 window.matterTemplateGui = matterTemplateGui;
-
-// Renderer
-
-let renderer = new Renderer(canvas);
-
-let sim_playing = false;
-
-function render_matter_simulation() {
-
-	window.s.world.bodies.forEach(function(o){
-	
-		o.parts.forEach(function(p){
-			renderer.renderVertices(p.vertices)
-		});
-
-	});
-
-}
-
-let interval_id;
