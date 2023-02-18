@@ -9,6 +9,13 @@ import EventHandler from "./eventHandler.js";
 
  function PolygonDefiner(canvas) {
 
+	let self = this;
+
+	this.delta = {
+		x: 0,
+		y: 0
+	}
+
 	let polygonDefiner = this;
 
 	/**
@@ -42,8 +49,8 @@ import EventHandler from "./eventHandler.js";
 
 	this.addVectorByMouseEvent = function(event) {
 		let v = {
-			x: event.offsetX,
-			y: event.offsetY,
+			x: event.offsetX - self.delta.x,
+			y: event.offsetY - self.delta.y,
 		};
 
 		polygonDefiner.vertices.push(v);

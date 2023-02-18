@@ -329,6 +329,13 @@ MatterTemplateGuiTab.prototype.createPolygonRidgidMethod = function() {
 
 }
 
+MatterTemplateGuiTab.prototype.incrementDelta = function(x,y) {
+	this.renderer.delta.x += x;
+	this.renderer.delta.y += y;
+	this.polygonCreator.delta.x += x;
+	this.polygonCreator.delta.y += y;
+}
+
 function MatterTemplateGui(container) {
 
 	this.container = container;

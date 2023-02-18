@@ -6,6 +6,12 @@ function Renderer(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.ctx.strokeStyle = "white";
+
+    this.delta = {
+        x: 0, 
+        y:0
+    };
+
 }
 
 /**
@@ -17,10 +23,10 @@ Renderer.prototype.renderVertices = function(vertices) {
 
     this.ctx.beginPath();
 
-    this.ctx.moveTo(vertices[0].x,vertices[0].y);
+    this.ctx.moveTo(vertices[0].x + this.delta.x,vertices[0].y + this.delta.y);
 
     for(var i = 1; i < vertices.length; i++ ) {
-        this.ctx.lineTo(vertices[i].x,vertices[i].y);
+        this.ctx.lineTo(vertices[i].x + this.delta.x ,vertices[i].y + this.delta.y);
     }
 
     this.ctx.closePath();
