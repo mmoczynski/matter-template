@@ -2,7 +2,6 @@ import PolygonCreator from "./src/polygonCreator.js";
 import Renderer from "./src/render.js";
 import bootstrapModal from "./src/bsModal.js";
 import {alertModal,confirmModal,promptModal} from "./src/alertModal.js";
-import {EventHander} from "./src/eventHandler.js"
 import MatterTemplateGuiTool from "./src/matterTemplateGuiTool.js";
 
 let canvas = document.createElement("canvas");
