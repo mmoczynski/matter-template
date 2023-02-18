@@ -15,7 +15,7 @@ document.body.appendChild(canvas);
 function MatterTemplateGuiTab() {
 
 	/**
-	 * @type {MatterTemplateGuiTab}
+	 * @type {MatterTemplateGui}
 	 */
 
 	this.parent = null;
@@ -181,7 +181,102 @@ MatterTemplateGuiTab.prototype.generateVertexCode = function() {
 	return txt;
 }
 
+MatterTemplateGuiTab.prototype.render_matter_simulation = function() {
+
+	window.s.world.bodies.forEach(function(o){
+	
+		o.parts.forEach(function(p){
+			matterTemplateGui.renderer.renderVertices(p.vertices)
+		});
+
+	});
+
+}
+
+MatterTemplateGuiTab.prototype.wireframeRun = function() {
+
+	let interval_id;
+
+	let self = this;
+
+	this.playing = true;
+
+	let toggle = document.createElement("span");
+	let reset = document.createElement("span");
+	let exit = document.createElement("span");
+
+	toggle.className = "bi bi-pause-fill toggle-button ctrl-button";
+	reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
+	exit.className = "bi bi-x exit-button ctrl-button";
+
+	let tools = document.createElement("span");
+	tools.className = "ctrl-tools";
+	tools.append(toggle,reset,exit);
+	this.parent.container.appendChild(tools);
+
+	window.s = MatterTemplate.Engine.create(this.shapes);
+
+
+	toggle.addEventListener("click",function(){
+
+		if(self.playing) {
+			toggle.classList.remove("bi-pause-fill");
+			toggle.classList.add("bi-play-fill");
+		}
+
+		else {
+			toggle.classList.remove("bi-play-fill");
+			toggle.classList.add("bi-pause-fill");
+		}
+
+		self.playing = !self.playing;
+
+		self.render_matter_simulation();
+
+	});
+
+
+	reset.addEventListener("click",function(){
+		Matter.Composite.clear(window.s.world,true,true);
+		window.s = MatterTemplate.Engine.create(self.shapes);
+	});
+
+	exit.addEventListener("click",function(){
+		self.playing = false;
+		Matter.Composite.clear(window.s.world,true,true);
+		clearInterval(interval_id);
+		window.s = null;
+		self.parent.renderer.renderWorld(self.shapes);
+		self.parent.container.removeChild(tools);
+	});
+
+	interval_id = setInterval(function(){
+
+		self.parent.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+
+		self.parent.renderer.ctx.strokeStyle = "#555";
+
+		self.parent.renderer.renderWorld(self.shapes);
+
+		self.parent.renderer.ctx.strokeStyle = "white";
+
+		if(self.playing) {
+			Matter.Engine.update(window.s);
+		}
+
+		if(self.parent.polygonCreator.vertices.length) {
+			self.parent.renderer.renderVertices(self.parent.polygonCreator.vertices);
+		}
+
+		self.render_matter_simulation();
+
+	},16.666);
+
+}
+
 function MatterTemplateGui(container) {
+
+	this.container = container;
 
 	let matterTemplateGui = this;
 
@@ -189,34 +284,22 @@ function MatterTemplateGui(container) {
 	this.currentTab.parent = this;
 	this.tabs = [this.currentTab];
 
-	let interval_id;
-
 	// Renderer
 
 	matterTemplateGui.renderer = new Renderer(canvas);
 
-	let sim_playing = false;
 
-	function render_matter_simulation() {
-
-		window.s.world.bodies.forEach(function(o){
-		
-			o.parts.forEach(function(p){
-				matterTemplateGui.renderer.renderVertices(p.vertices)
-			});
-
-		});
-
-	}
 
 	let polygonCreator = new PolygonCreator(canvas);
+
+	this.polygonCreator = polygonCreator;
 
 	polygonCreator.on("definePolygon",function(event){
 		matterTemplateGui.currentTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
 		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
 
-		if(sim_playing) {
-			render_matter_simulation();
+		if(matterTemplateGui.currentTab.playing) {
+			matterTemplateGui.currentTab.render_matter_simulation();
 		}
 
 	});
@@ -227,8 +310,8 @@ function MatterTemplateGui(container) {
 		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
 		matterTemplateGui.renderer.renderVertices(polygonCreator.vertices);
 
-		if(sim_playing) {
-			render_matter_simulation();
+		if(matterTemplateGui.currentTab.playing) {
+			matterTemplateGui.currentTab.render_matter_simulation();
 		}
 
 	});
@@ -251,85 +334,8 @@ function MatterTemplateGui(container) {
 		matterTemplateGui.currentTab.export()
 	});
 
-	container.querySelector(".wireframe-run").addEventListener("click",function() {
-
-		if(matterTemplateGui.currentTool) {
-			matterTemplateGui.currentTool.disable();
-		}
-
-		sim_playing = true;
-	
-		let toggle = document.createElement("span");
-		let reset = document.createElement("span");
-		let exit = document.createElement("span");
-	
-		toggle.className = "bi bi-pause-fill toggle-button ctrl-button";
-		reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
-		exit.className = "bi bi-x exit-button ctrl-button";
-	
-		let tools = document.createElement("span");
-		tools.className = "ctrl-tools";
-		tools.append(toggle,reset,exit);
-		container.appendChild(tools);
-	
-		window.s = MatterTemplate.Engine.create(matterTemplateGui.currentTab.shapes);
-	
-	
-		toggle.addEventListener("click",function(){
-	
-			if(sim_playing) {
-				toggle.classList.remove("bi-pause-fill");
-				toggle.classList.add("bi-play-fill");
-			}
-	
-			else {
-				toggle.classList.remove("bi-play-fill");
-				toggle.classList.add("bi-pause-fill");
-			}
-	
-			sim_playing = !sim_playing;
-	
-			render_matter_simulation();
-	
-		});
-	
-	
-		reset.addEventListener("click",function(){
-			Matter.Composite.clear(window.s.world,true,true);
-			window.s = MatterTemplate.Engine.create(matterTemplateGui.currentTab.shapes);
-		});
-	
-		exit.addEventListener("click",function(){
-			sim_playing = false;
-			Matter.Composite.clear(window.s.world,true,true);
-			clearInterval(interval_id);
-			window.s = null;
-			matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
-			container.removeChild(tools);
-		});
-	
-		interval_id = setInterval(function(){
-	
-			matterTemplateGui.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-	
-			matterTemplateGui.renderer.ctx.strokeStyle = "#555";
-	
-			matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
-	
-			matterTemplateGui.renderer.ctx.strokeStyle = "white";
-	
-			if(sim_playing) {
-				Matter.Engine.update(window.s);
-			}
-	
-			if(polygonCreator.vertices.length) {
-				matterTemplateGui.renderer.renderVertices(polygonCreator.vertices);
-			}
-	
-			render_matter_simulation();
-	
-		},16.666);
-	
+	container.querySelector(".wireframe-run").addEventListener("click",function(){
+		matterTemplateGui.currentTab.wireframeRun();
 	});
 
 	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
