@@ -44,6 +44,32 @@ function MatterTemplateGuiTab() {
 	
 	this.newChanges = false;
 
+	let polygonCreator = new PolygonCreator(canvas);
+
+	this.polygonCreator = polygonCreator;
+
+	polygonCreator.on("definePolygon",function(event){
+		matterTemplateGuiTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
+		matterTemplateGuiTab.parent.renderer.renderWorld(matterTemplateGuiTab.shapes);
+
+		if(matterTemplateGuiTab.playing) {
+			matterTemplateGuiTab.render_matter_simulation();
+		}
+
+	});
+
+	polygonCreator.on("pushVector",function(){
+
+		matterTemplateGuiTab.parent.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+		matterTemplateGuiTab.parent.renderer.renderWorld(matterTemplateGuiTab.shapes);
+		matterTemplateGuiTab.parent.renderer.renderVertices(polygonCreator.vertices);
+
+		if(matterTemplateGuiTab.playing) {
+			matterTemplateGuiTab.render_matter_simulation();
+		}
+
+	});
+
 }
 
 MatterTemplateGuiTab.bootstrapModal = bootstrapModal;
@@ -264,13 +290,38 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 			Matter.Engine.update(window.s);
 		}
 
-		if(self.parent.polygonCreator.vertices.length) {
-			self.parent.renderer.renderVertices(self.parent.polygonCreator.vertices);
+		if(self.polygonCreator.vertices.length) {
+			self.parent.renderer.renderVertices(self.polygonCreator.vertices);
 		}
 
 		self.render_matter_simulation();
 
 	},16.666);
+
+}
+
+MatterTemplateGuiTab.prototype.createPolygonRidgidMethod = function() {
+
+	let self = this;
+
+	this.polygonCreator.enable();
+
+	let reset = document.createElement("span");
+	let exit = document.createElement("span");
+
+	exit.addEventListener("click",function(){
+		self.polygonCreator.disable();
+		self.parent.container.removeChild(tools);
+	});
+
+	reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
+	exit.className = "bi bi-x exit-button ctrl-button";
+
+	let tools = document.createElement("span");
+	tools.className = "ctrl-tools";
+	tools.append(reset,exit);
+	self.parent.container.appendChild(tools);
+
 
 }
 
@@ -287,34 +338,6 @@ function MatterTemplateGui(container) {
 	// Renderer
 
 	matterTemplateGui.renderer = new Renderer(canvas);
-
-
-
-	let polygonCreator = new PolygonCreator(canvas);
-
-	this.polygonCreator = polygonCreator;
-
-	polygonCreator.on("definePolygon",function(event){
-		matterTemplateGui.currentTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
-
-		if(matterTemplateGui.currentTab.playing) {
-			matterTemplateGui.currentTab.render_matter_simulation();
-		}
-
-	});
-
-	polygonCreator.on("pushVector",function(){
-
-		matterTemplateGui.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
-		matterTemplateGui.renderer.renderVertices(polygonCreator.vertices);
-
-		if(matterTemplateGui.currentTab.playing) {
-			matterTemplateGui.currentTab.render_matter_simulation();
-		}
-
-	});
 
 	// Toolbar
 
@@ -339,25 +362,7 @@ function MatterTemplateGui(container) {
 	});
 
 	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
-		
-		polygonCreator.enable();
-
-		let reset = document.createElement("span");
-		let exit = document.createElement("span");
-
-		exit.addEventListener("click",function(){
-			polygonCreator.disable();
-			container.removeChild(tools);
-		});
-	
-		reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
-		exit.className = "bi bi-x exit-button ctrl-button";
-	
-		let tools = document.createElement("span");
-		tools.className = "ctrl-tools";
-		tools.append(reset,exit);
-		container.appendChild(tools);
-
+		matterTemplateGui.currentTab.createPolygonRidgidMethod();
 	});
 
 }
