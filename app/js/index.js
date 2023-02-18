@@ -2,6 +2,8 @@ import PolygonCreator from "./src/polygonCreator.js";
 import Renderer from "./src/render.js";
 import bootstrapModal from "./src/bsModal.js";
 import {alertModal,confirmModal,promptModal} from "./src/alertModal.js";
+import {EventHander} from "./src/eventHandler.js"
+import MatterTemplateGuiTool from "./src/matterTemplateGuiTool.js";
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
@@ -210,8 +212,6 @@ function MatterTemplateGui(container) {
 
 	let polygonCreator = new PolygonCreator(canvas);
 
-	polygonCreator.enable();
-
 	polygonCreator.on("definePolygon",function(event){
 		matterTemplateGui.currentTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
 		matterTemplateGui.renderer.renderWorld(matterTemplateGui.currentTab.shapes);
@@ -253,6 +253,10 @@ function MatterTemplateGui(container) {
 	});
 
 	container.querySelector(".wireframe-run").addEventListener("click",function() {
+
+		if(matterTemplateGui.currentTool) {
+			matterTemplateGui.currentTool.disable();
+		}
 
 		sim_playing = true;
 	
@@ -297,6 +301,7 @@ function MatterTemplateGui(container) {
 		});
 	
 		exit.addEventListener("click",function(){
+			sim_playing = false;
 			Matter.Composite.clear(window.s.world,true,true);
 			clearInterval(interval_id);
 			window.s = null;
@@ -326,6 +331,28 @@ function MatterTemplateGui(container) {
 	
 		},16.666);
 	
+	});
+
+	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
+		
+		polygonCreator.enable();
+
+		let reset = document.createElement("span");
+		let exit = document.createElement("span");
+
+		exit.addEventListener("click",function(){
+			polygonCreator.disable();
+			container.removeChild(tools);
+		});
+	
+		reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
+		exit.className = "bi bi-x exit-button ctrl-button";
+	
+		let tools = document.createElement("span");
+		tools.className = "ctrl-tools";
+		tools.append(reset,exit);
+		container.appendChild(tools);
+
 	});
 
 }
