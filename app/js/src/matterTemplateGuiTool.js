@@ -1,4 +1,4 @@
-import {EventHander} from "./eventHandler.js"
+import EventHander from "./eventHandler.js"
 
 function MatterTemplateGuiTool(parent) {
 	this.parent = parent;
