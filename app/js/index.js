@@ -26,6 +26,8 @@ function MatterTemplateGuiTab(parent) {
 
 	this.parent = parent;
 
+	var self = this;
+
 	let matterTemplateGuiTab = this;
 
 	this.history = [];
@@ -62,31 +64,58 @@ function MatterTemplateGuiTab(parent) {
 
 	polygonCreator.on("definePolygon",function(event){
 		matterTemplateGuiTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-		//matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
-
-		/**if(matterTemplateGuiTab.playing) {
-			matterTemplateGuiTab.render_matter_simulation();
-		}
-		**/
-
-	});
-
-	polygonCreator.on("pushVector",function(){
-
-		//matterTemplateGuiTab.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-		//matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
-		//matterTemplateGuiTab.renderer.renderVertices(polygonCreator.vertices);
-
-		/**if(matterTemplateGuiTab.playing) {
-			matterTemplateGuiTab.render_matter_simulation();
-		}
-		**/
-
 	});
 
 	// Circle Creator
 
 	this.circleCreator = new CircleCreator(this);
+
+	// Application loop
+
+	setInterval(function(){
+
+		matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
+
+		// Render vertices of polygon creator if active
+
+		if(self.polygonCreator.vertices.length) {
+			self.renderer.renderVertices(self.polygonCreator.vertices);
+		}
+
+		// Render circle of circle creator if active
+
+		if(self.circleCreator.center) {
+			
+			self.renderer.ctx.beginPath();
+
+			/**
+			 * Render circle arc
+			 * See https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/arc
+			 */
+
+    		self.renderer.ctx.arc(
+				self.circleCreator.center.x, 
+				self.circleCreator.center.y, 
+				self.circleCreator.getRadius(),
+				0,
+				Math.PI *2
+			);
+        	
+			self.renderer.ctx.stroke();
+		}
+
+		// If playing
+
+		if(self.playing) {
+			Matter.Engine.update(window.s);
+			self.render_matter_simulation();
+		}
+
+
+
+
+
+	},16.666);
 
 }
 
@@ -137,7 +166,6 @@ MatterTemplateGuiTab.prototype.new = function() {
 
 		}
  
-		//self.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 
 	}).catch()
 
@@ -164,7 +192,6 @@ MatterTemplateGuiTab.prototype.open = function() {
 
 				fileReader.addEventListener("load",function(){
 					self.shapes = JSON.parse(fileReader.result);
-					//self.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 				});
 
 				fileReader.readAsText(m.files[0])
@@ -263,8 +290,6 @@ MatterTemplateGuiTab.prototype.activateKeyTransform = function() {
 			self.incrementDelta(delta,0);
 		}
 
-		//self.renderer.renderWorld(self.shapes);
-
 	});
 
 }
@@ -307,8 +332,6 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 
 		self.playing = !self.playing;
 
-		self.render_matter_simulation();
-
 	});
 
 
@@ -320,33 +343,10 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 	exit.addEventListener("click",function(){
 		self.playing = false;
 		Matter.Composite.clear(window.s.world,true,true);
-		clearInterval(interval_id);
 		window.s = null;
 		//self.renderer.renderWorld(self.shapes);
 		self.parent.container.removeChild(tools);
 	});
-
-	interval_id = setInterval(function(){
-
-		self.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-
-		self.renderer.ctx.strokeStyle = "#555";
-
-		self.renderer.renderWorld(self.shapes);
-
-		self.renderer.ctx.strokeStyle = "white";
-
-		if(self.playing) {
-			Matter.Engine.update(window.s);
-		}
-
-		if(self.polygonCreator.vertices.length) {
-			//self.renderer.renderVertices(self.polygonCreator.vertices);
-		}
-
-		self.render_matter_simulation();
-
-	},16.666);
 
 }
 

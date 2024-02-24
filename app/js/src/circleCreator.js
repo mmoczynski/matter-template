@@ -52,6 +52,8 @@ CircleCreator.prototype.enable = function() {
             /**
              * Used to define the center point of the circle.
              * @type {undefined|Object}
+             * @property {Number} x - X coordinate
+             * @property {Number} y
              */
     
             self.center = {
@@ -95,18 +97,12 @@ CircleCreator.prototype.enable = function() {
 
     this.onmousemove = function(event) {
 
-        //self.matterTemplateGuiTab.renderer.renderWorld(self.matterTemplateGuiTab.shapes);
-
         if(self.center) {
 
             self.secondPoint = {
                 x: event.x,
                 y: event.y
             }
-
-            //self.matterTemplateGuiTab.renderer.ctx.beginPath();
-            //self.matterTemplateGuiTab.renderer.ctx.arc(self.center.x,self.center.y,self.getRadius(),0,Math.PI *2);
-            //self.matterTemplateGuiTab.renderer.ctx.stroke();
         }
 
     }
