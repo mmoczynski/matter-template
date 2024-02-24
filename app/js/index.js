@@ -116,8 +116,17 @@ function MatterTemplateGuiTab(parent) {
 		// If playing
 
 		if(self.playing) {
+
 			Matter.Engine.update(window.s);
-			self.render_matter_simulation();
+
+			window.s.world.bodies.forEach(function(o){
+	
+				o.parts.forEach(function(p){
+					self.renderer.renderVertices(p.vertices)
+				});
+		
+			});
+
 		}
 
 
@@ -263,13 +272,7 @@ MatterTemplateGuiTab.prototype.generateVertexCode = function() {
 
 MatterTemplateGuiTab.prototype.render_matter_simulation = function() {
 
-	window.s.world.bodies.forEach(function(o){
-	
-		o.parts.forEach(function(p){
-			matterTemplateGui.currentTab.renderer.renderVertices(p.vertices)
-		});
 
-	});
 
 }
 
