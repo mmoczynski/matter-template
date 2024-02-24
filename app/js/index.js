@@ -9,8 +9,17 @@ let canvas = document.createElement("canvas");
 window.canvas = canvas;
 
 canvas.id = "mattertree-gui-canvas";
+
+// Set definitions 
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+window.addEventListener("resize", function(){
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+})
+
 document.body.appendChild(canvas);
 
 /**
