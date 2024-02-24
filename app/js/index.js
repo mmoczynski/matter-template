@@ -3,6 +3,7 @@ import Renderer from "./src/render.js";
 import bootstrapModal from "./src/bsModal.js";
 import {alertModal,confirmModal,promptModal} from "./src/alertModal.js";
 import MatterTemplateGuiTool from "./src/matterTemplateGuiTool.js";
+import CircleCreator from "./src/circleCreator.js";
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
@@ -12,13 +13,18 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 document.body.appendChild(canvas);
 
-function MatterTemplateGuiTab() {
+/**
+ * 
+ * @param {MatterTemplateGuiTab} parent 
+ */
+
+function MatterTemplateGuiTab(parent) {
 
 	/**
 	 * @type {MatterTemplateGui}
 	 */
 
-	this.parent = null;
+	this.parent = parent;
 
 	let matterTemplateGuiTab = this;
 
@@ -48,31 +54,39 @@ function MatterTemplateGuiTab() {
 	
 	this.newChanges = false;
 
+	// Polygon Creator
+
 	let polygonCreator = new PolygonCreator(canvas);
 
 	this.polygonCreator = polygonCreator;
 
 	polygonCreator.on("definePolygon",function(event){
 		matterTemplateGuiTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
-		matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
+		//matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
 
-		if(matterTemplateGuiTab.playing) {
+		/**if(matterTemplateGuiTab.playing) {
 			matterTemplateGuiTab.render_matter_simulation();
 		}
+		**/
 
 	});
 
 	polygonCreator.on("pushVector",function(){
 
-		matterTemplateGuiTab.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
-		matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
-		matterTemplateGuiTab.renderer.renderVertices(polygonCreator.vertices);
+		//matterTemplateGuiTab.renderer.ctx.clearRect(0,0,canvas.width,canvas.height);
+		//matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
+		//matterTemplateGuiTab.renderer.renderVertices(polygonCreator.vertices);
 
-		if(matterTemplateGuiTab.playing) {
+		/**if(matterTemplateGuiTab.playing) {
 			matterTemplateGuiTab.render_matter_simulation();
 		}
+		**/
 
 	});
+
+	// Circle Creator
+
+	this.circleCreator = new CircleCreator(this);
 
 }
 
@@ -123,7 +137,7 @@ MatterTemplateGuiTab.prototype.new = function() {
 
 		}
  
-		self.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
+		//self.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 
 	}).catch()
 
@@ -150,7 +164,7 @@ MatterTemplateGuiTab.prototype.open = function() {
 
 				fileReader.addEventListener("load",function(){
 					self.shapes = JSON.parse(fileReader.result);
-					self.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
+					//self.renderer.renderWorld(MatterTemplateGuiTab.currentInstance.shapes);
 				});
 
 				fileReader.readAsText(m.files[0])
@@ -249,7 +263,7 @@ MatterTemplateGuiTab.prototype.activateKeyTransform = function() {
 			self.incrementDelta(delta,0);
 		}
 
-		self.renderer.renderWorld(self.shapes);
+		//self.renderer.renderWorld(self.shapes);
 
 	});
 
@@ -308,7 +322,7 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 		Matter.Composite.clear(window.s.world,true,true);
 		clearInterval(interval_id);
 		window.s = null;
-		self.renderer.renderWorld(self.shapes);
+		//self.renderer.renderWorld(self.shapes);
 		self.parent.container.removeChild(tools);
 	});
 
@@ -327,7 +341,7 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 		}
 
 		if(self.polygonCreator.vertices.length) {
-			self.renderer.renderVertices(self.polygonCreator.vertices);
+			//self.renderer.renderVertices(self.polygonCreator.vertices);
 		}
 
 		self.render_matter_simulation();
@@ -374,8 +388,7 @@ function MatterTemplateGui(container) {
 
 	let matterTemplateGui = this;
 
-	this.currentTab = new MatterTemplateGuiTab();
-	this.currentTab.parent = this;
+	this.currentTab = new MatterTemplateGuiTab(this);
 	this.tabs = [this.currentTab];
 
 	// Toolbar

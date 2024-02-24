@@ -35,12 +35,26 @@ Renderer.prototype.renderVertices = function(vertices) {
 
 }
 
+Renderer.prototype.renderCircle = function(circle) {
+    this.ctx.beginPath();
+    this.ctx.arc(circle.x,circle.y,circle.radius,0,Math.PI *2);
+    this.ctx.stroke();
+}
+
 Renderer.prototype.renderWorld = function(worldArray) {
 
     this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 
     for(let i = 0; i < worldArray.length; i++) {
-        this.renderVertices(worldArray[i]);   
+
+        if(worldArray[i].shape === "circle") {
+            this.renderCircle(worldArray[i]);  
+        }
+        
+        else {
+            this.renderVertices(worldArray[i]);  
+        }
+
     }
 }
 
