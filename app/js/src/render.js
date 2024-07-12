@@ -50,10 +50,11 @@ Renderer.prototype.renderWorld = function(worldArray) {
         if(worldArray[i].shape === "circle") {
             this.renderCircle(worldArray[i]);  
         }
-        
-        else {
-            this.renderVertices(worldArray[i]);  
+
+        if(worldArray[i].shape === "vertices") {
+            this.renderVertices(worldArray[i].vertexSets);
         }
+        
 
     }
 }
