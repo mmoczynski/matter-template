@@ -4,6 +4,8 @@ import bootstrapModal from "./src/bsModal.js";
 import {alertModal,confirmModal,promptModal} from "./src/alertModal.js";
 import MatterTemplateGuiTool from "./src/matterTemplateGuiTool.js";
 import CircleCreator from "./src/circleCreator.js";
+import eventHandler from "./src/eventHandler.js";
+import SelectionTool from "./src/selectionTool.js";
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
@@ -35,6 +37,7 @@ function MatterTemplateGuiTab(parent) {
 
 	this.parent = parent;
 
+	// Alternative variable name for this keyword
 	var self = this;
 
 	let matterTemplateGuiTab = this;
@@ -42,8 +45,11 @@ function MatterTemplateGuiTab(parent) {
 	this.history = [];
 
 	// Renderer
-
 	this.renderer = new Renderer(canvas);
+
+	// Selection Tool
+	this.selectionTool = new SelectionTool(this);
+
 
 	this.shapes = new Proxy([],{
 
@@ -72,16 +78,24 @@ function MatterTemplateGuiTab(parent) {
 	this.polygonCreator = polygonCreator;
 
 	polygonCreator.on("definePolygon",function(event){
-		matterTemplateGuiTab.shapes.push(JSON.parse(JSON.stringify(event.vertices)));
+
+		let c = Matter.Vertices.centre(event.vertices);
+
+		matterTemplateGuiTab.shapes.push({
+			vertexSets: JSON.parse(JSON.stringify(event.vertices)),
+			shape: "vertices",
+			x: c.x,
+			y: c.y
+		});
 	});
 
 	// Circle Creator
-
 	this.circleCreator = new CircleCreator(this);
 
 	// Application loop
-
 	setInterval(function(){
+
+		// Objects loop
 
 		matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
 
@@ -113,6 +127,60 @@ function MatterTemplateGuiTab(parent) {
 			self.renderer.ctx.stroke();
 		}
 
+		// Render selection
+
+		if(self.selectionTool.selectedObjects.length) {
+
+			for(var i = 0; i < self.selectionTool.selectedObjects.length; i++) {
+
+				if(self.selectionTool.selectedObjects[i].shape === "circle") {
+
+					self.renderer.ctx.beginPath();
+
+					self.renderer.ctx.arc(
+						self.selectionTool.selectedObjects[i].x, 
+						self.selectionTool.selectedObjects[i].y, 
+						3,
+						0,
+						Math.PI *2
+					);
+		
+					
+					self.renderer.ctx.fillStyle = "white";
+					self.renderer.ctx.fill();
+					
+					self.renderer.ctx.stroke();
+
+				}
+
+				else {
+
+					for(let j = 0; j < self.selectionTool.selectedObjects[i].length; j++) {
+
+						self.renderer.ctx.beginPath();
+
+						self.renderer.ctx.arc(
+							self.selectionTool.selectedObjects[i][j].x, 
+							self.selectionTool.selectedObjects[i][j].y, 
+							3,
+							0,
+							Math.PI *2
+						);
+			
+						
+						self.renderer.ctx.fillStyle = "white";
+						self.renderer.ctx.fill();
+						
+						self.renderer.ctx.stroke();
+
+					}
+
+				}
+
+			}
+
+		}
+
 		// If playing
 
 		if(self.playing) {
@@ -128,10 +196,6 @@ function MatterTemplateGuiTab(parent) {
 			});
 
 		}
-
-
-
-
 
 	},16.666);
 
@@ -393,6 +457,9 @@ MatterTemplateGuiTab.prototype.incrementDelta = function(x,y) {
 	this.polygonCreator.delta.x += x;
 	this.polygonCreator.delta.y += y;
 }
+
+// Attach events
+Object.assign(MatterTemplateGui.prototype,eventHandler);
 
 function MatterTemplateGui(container) {
 
