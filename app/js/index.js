@@ -6,6 +6,9 @@ import MatterTemplateGuiTool from "./src/matterTemplateGuiTool.js";
 import CircleCreator from "./src/circleCreator.js";
 import eventHandler from "./src/eventHandler.js";
 import SelectionTool from "./src/selectionTool.js";
+import { transformObject } from "./src/transformObject.js";
+
+window.transformObject = transformObject;
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
