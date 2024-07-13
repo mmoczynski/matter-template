@@ -501,6 +501,29 @@ function MatterTemplateGui(container) {
 
 }
 
+function transformSelectedObjectsByMouse(event) {
+
+	matterTemplateGui.currentTab.selectionTool.selectedObjects.forEach(function(o){
+		transformObject(o, {
+			x: event.movementX,
+			y: event.movementY
+		})
+	});
+
+}
+
+canvas.addEventListener("mousedown", function(){
+
+	if(matterTemplateGui.currentTab.selectionTool.selectedObjects.length) {
+		canvas.addEventListener("mousemove", transformSelectedObjectsByMouse);
+	}
+
+});
+
+canvas.addEventListener("mouseup", function(){
+	canvas.removeEventListener("mousemove", transformSelectedObjectsByMouse);
+});
+
 let matterTemplateGui = new MatterTemplateGui(document.body);
 MatterTemplateGuiTab.currentInstance = matterTemplateGui.currentTab;
 
