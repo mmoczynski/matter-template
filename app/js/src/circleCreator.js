@@ -1,16 +1,16 @@
 /**
  * 
- * @param {MatterTemplateGuiTab} matterTemplateGuiTab 
+ * @param {MatterTemplateGuiTab} matterTemplateGui 
  */
 
-function CircleCreator(matterTemplateGuiTab) {
+function CircleCreator(matterTemplateGui) {
 
     let self = this;
 
-    this.matterTemplateGuiTab = matterTemplateGuiTab;
+    this.matterTemplateGui = matterTemplateGui;
     this.shapeName = "circle";
 
-    matterTemplateGuiTab.parent.container.querySelector(".activate-circle-creation").addEventListener("click",function(){
+    matterTemplateGui.container.querySelector(".activate-circle-creation").addEventListener("click",function(){
         self.enable();
     });
 
@@ -29,7 +29,7 @@ CircleCreator.prototype.enable = function() {
 
 	exit.addEventListener("click",function(){
 		self.disable();
-		self.matterTemplateGuiTab.parent.container.removeChild(tools);
+		self.matterTemplateGui.container.removeChild(tools);
 	});
 
 	reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
@@ -38,7 +38,7 @@ CircleCreator.prototype.enable = function() {
 	let tools = document.createElement("span");
 	tools.className = "ctrl-tools";
 	tools.append(reset,exit);
-	this.matterTemplateGuiTab.parent.container.appendChild(tools);
+	this.matterTemplateGui.container.appendChild(tools);
 
     /**
      * 
@@ -78,7 +78,7 @@ CircleCreator.prototype.enable = function() {
     
         else if(self.center && self.secondPoint) {
     
-            self.matterTemplateGuiTab.shapes.push({
+            self.matterTemplateGui.shapes.push({
                 x: self.center.x,
                 y: self.center.y,
                 radius: self.getRadius(),
@@ -107,13 +107,13 @@ CircleCreator.prototype.enable = function() {
 
     }
 
-    this.matterTemplateGuiTab.renderer.canvas.addEventListener("click",this.onclick);
-    this.matterTemplateGuiTab.renderer.canvas.addEventListener("mousemove",this.onmousemove);
+    this.matterTemplateGui.renderer.canvas.addEventListener("click",this.onclick);
+    this.matterTemplateGui.renderer.canvas.addEventListener("mousemove",this.onmousemove);
 }
 
 CircleCreator.prototype.disable = function() {
-    this.matterTemplateGuiTab.renderer.canvas.removeEventListener("click",this.onclick);
-    this.matterTemplateGuiTab.renderer.canvas.removeEventListener("mousemove",this.onmousemove);
+    this.matterTemplateGui.renderer.canvas.removeEventListener("click",this.onclick);
+    this.matterTemplateGui.renderer.canvas.removeEventListener("mousemove",this.onmousemove);
     self.center = undefined;
     self.secondPoint = undefined;
 }
