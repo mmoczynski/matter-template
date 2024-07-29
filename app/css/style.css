@@ -1,0 +1,44 @@
+body, html {
+    background: #111;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.nav {
+    --bs-nav-tabs-border-radius: 0;
+    --bs-nav-link-color: white;
+    --bs-nav-link-hover-color: #ccc;
+}
+
+.dropdown-menu {
+    --bs-dropdown-bg: #222;     
+    --bs-dropdown-link-color: #ffffff;
+    --bs-dropdown-link-hover-color: white;
+    --bs-dropdown-link-hover-bg: #333;
+}
+
+.modal {
+    --bs-modal-bg: #333;
+}
+
+.ctrl-button {
+    display: inline-block;
+    background-color: #333;
+    padding: 10px;
+    margin: 10px;
+    font-size: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.ctrl-tools {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.main-nav {
+    position: absolute;
+    width: 100%;
+}
