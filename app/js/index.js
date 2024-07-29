@@ -6,6 +6,9 @@ import MatterTemplateGuiTool from "./src/matterTemplateGuiTool.js";
 import CircleCreator from "./src/circleCreator.js";
 import eventHandler from "./src/eventHandler.js";
 import SelectionTool from "./src/selectionTool.js";
+import { transformObject } from "./src/transformObject.js";
+
+window.transformObject = transformObject;
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
@@ -24,23 +27,42 @@ window.addEventListener("resize", function(){
 
 document.body.appendChild(canvas);
 
-/**
- * 
- * @param {MatterTemplateGuiTab} parent 
- */
 
-function MatterTemplateGuiTab(parent) {
+function MatterTemplateGui(container) {
 
-	/**
-	 * @type {MatterTemplateGui}
-	 */
+	this.container = container;
 
-	this.parent = parent;
+	let matterTemplateGui = this;
+
+
+	// Toolbar
+
+	container.querySelector(".action-save-file").addEventListener("click",function(){
+		matterTemplateGui.save();
+	});
+
+	container.querySelector(".action-open-file").addEventListener("click",function(){
+		matterTemplateGui.open()
+	});
+
+	container.querySelector(".action-new-file").addEventListener("click",function(){
+		matterTemplateGui.new()
+	});
+
+	container.querySelector(".action-export").addEventListener("click",function(){
+		matterTemplateGui.export()
+	});
+
+	container.querySelector(".wireframe-run").addEventListener("click",function(){
+		matterTemplateGui.wireframeRun();
+	});
+
+	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
+		matterTemplateGui.createPolygonRidgidMethod();
+	});
 
 	// Alternative variable name for this keyword
 	var self = this;
-
-	let matterTemplateGuiTab = this;
 
 	this.history = [];
 
@@ -55,9 +77,9 @@ function MatterTemplateGuiTab(parent) {
 
 		set: function(target,string,value) {
 
-			matterTemplateGuiTab.newChanges = true;
+			matterTemplateGui.newChanges = true;
 			
-			matterTemplateGuiTab.history.push({
+			matterTemplateGui.history.push({
 				target: target,
 				property: string,
 				newValue: value,
@@ -81,7 +103,7 @@ function MatterTemplateGuiTab(parent) {
 
 		let c = Matter.Vertices.centre(event.vertices);
 
-		matterTemplateGuiTab.shapes.push({
+		matterTemplateGui.shapes.push({
 			vertexSets: JSON.parse(JSON.stringify(event.vertices)),
 			shape: "vertices",
 			x: c.x,
@@ -97,7 +119,7 @@ function MatterTemplateGuiTab(parent) {
 
 		// Objects loop
 
-		matterTemplateGuiTab.renderer.renderWorld(matterTemplateGuiTab.shapes);
+		matterTemplateGui.renderer.renderWorld(matterTemplateGui.shapes);
 
 		// Render vertices of polygon creator if active
 
@@ -201,21 +223,21 @@ function MatterTemplateGuiTab(parent) {
 
 }
 
-MatterTemplateGuiTab.bootstrapModal = bootstrapModal;
-MatterTemplateGuiTab.alert = alertModal
-MatterTemplateGuiTab.confirm = confirmModal;
-MatterTemplateGuiTab.prompt = promptModal;
+MatterTemplateGui.bootstrapModal = bootstrapModal;
+MatterTemplateGui.alert = alertModal
+MatterTemplateGui.confirm = confirmModal;
+MatterTemplateGui.prompt = promptModal;
 
-window.MatterTemplateGuiTab = MatterTemplateGuiTab;
+window.MatterTemplateGui = MatterTemplateGui;
 
-MatterTemplateGuiTab.prototype.new = function() {
+MatterTemplateGui.prototype.new = function() {
 
 	let self = this;
 
 	new Promise(function(resolve){
 		
 		if(self.newChanges) {
-			MatterTemplateGuiTab.confirm("Are you sure you want to create a new project?", function(){
+			MatterTemplateGui.confirm("Are you sure you want to create a new project?", function(){
 				resolve(1)
 			},function(){
 				resolve(0);
@@ -254,12 +276,12 @@ MatterTemplateGuiTab.prototype.new = function() {
 
 }
 
-MatterTemplateGuiTab.prototype.open = function() {
+MatterTemplateGui.prototype.open = function() {
 
 	let self = this;
 
 	return new Promise(function(resolve,reject){
-		MatterTemplateGuiTab.confirm("Are you sure you want to open a file?", resolve, reject);
+		MatterTemplateGui.confirm("Are you sure you want to open a file?", resolve, reject);
 	}).then(function(){
 	
 		let m = document.createElement("input");
@@ -289,7 +311,7 @@ MatterTemplateGuiTab.prototype.open = function() {
 
 }
 
-MatterTemplateGuiTab.prototype.save = function() {
+MatterTemplateGui.prototype.save = function() {
 
 	let self = this;
 
@@ -304,7 +326,7 @@ MatterTemplateGuiTab.prototype.save = function() {
 
 }
 
-MatterTemplateGuiTab.prototype.export = function() {
+MatterTemplateGui.prototype.export = function() {
 
 	let self = this;
 
@@ -318,7 +340,7 @@ MatterTemplateGuiTab.prototype.export = function() {
     a.click();
 }
 
-MatterTemplateGuiTab.prototype.generateVertexCode = function() {
+MatterTemplateGui.prototype.generateVertexCode = function() {
 
 	let txt = "let composite = Matter.composite.create();\n\n";
 	
@@ -334,13 +356,13 @@ MatterTemplateGuiTab.prototype.generateVertexCode = function() {
 	return txt;
 }
 
-MatterTemplateGuiTab.prototype.render_matter_simulation = function() {
+MatterTemplateGui.prototype.render_matter_simulation = function() {
 
 
 
 }
 
-MatterTemplateGuiTab.prototype.activateKeyTransform = function() {
+MatterTemplateGui.prototype.activateKeyTransform = function() {
 
 	let self = this;
 	let delta = 5;
@@ -370,7 +392,7 @@ MatterTemplateGuiTab.prototype.activateKeyTransform = function() {
 
 }
 
-MatterTemplateGuiTab.prototype.wireframeRun = function() {
+MatterTemplateGui.prototype.wireframeRun = function() {
 
 	let interval_id;
 
@@ -389,7 +411,7 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 	let tools = document.createElement("span");
 	tools.className = "ctrl-tools";
 	tools.append(toggle,reset,exit);
-	this.parent.container.appendChild(tools);
+	this.container.appendChild(tools);
 
 	window.s = MatterTemplate.Engine.create(this.shapes);
 
@@ -421,12 +443,12 @@ MatterTemplateGuiTab.prototype.wireframeRun = function() {
 		Matter.Composite.clear(window.s.world,true,true);
 		window.s = null;
 		//self.renderer.renderWorld(self.shapes);
-		self.parent.container.removeChild(tools);
+		self.container.removeChild(tools);
 	});
 
 }
 
-MatterTemplateGuiTab.prototype.createPolygonRidgidMethod = function() {
+MatterTemplateGui.prototype.createPolygonRidgidMethod = function() {
 
 	let self = this;
 
@@ -437,7 +459,7 @@ MatterTemplateGuiTab.prototype.createPolygonRidgidMethod = function() {
 
 	exit.addEventListener("click",function(){
 		self.polygonCreator.disable();
-		self.parent.container.removeChild(tools);
+		self.container.removeChild(tools);
 	});
 
 	reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
@@ -446,12 +468,12 @@ MatterTemplateGuiTab.prototype.createPolygonRidgidMethod = function() {
 	let tools = document.createElement("span");
 	tools.className = "ctrl-tools";
 	tools.append(reset,exit);
-	self.parent.container.appendChild(tools);
+	self.container.appendChild(tools);
 
 
 }
 
-MatterTemplateGuiTab.prototype.incrementDelta = function(x,y) {
+MatterTemplateGui.prototype.incrementDelta = function(x,y) {
 	this.renderer.delta.x += x;
 	this.renderer.delta.y += y;
 	this.polygonCreator.delta.x += x;
@@ -461,44 +483,30 @@ MatterTemplateGuiTab.prototype.incrementDelta = function(x,y) {
 // Attach events
 Object.assign(MatterTemplateGui.prototype,eventHandler);
 
-function MatterTemplateGui(container) {
 
-	this.container = container;
+function transformSelectedObjectsByMouse(event) {
 
-	let matterTemplateGui = this;
-
-	this.currentTab = new MatterTemplateGuiTab(this);
-	this.tabs = [this.currentTab];
-
-	// Toolbar
-
-	container.querySelector(".action-save-file").addEventListener("click",function(){
-		matterTemplateGui.currentTab.save();
-	});
-
-	container.querySelector(".action-open-file").addEventListener("click",function(){
-		matterTemplateGui.currentTab.open()
-	});
-
-	container.querySelector(".action-new-file").addEventListener("click",function(){
-		matterTemplateGui.currentTab.new()
-	});
-
-	container.querySelector(".action-export").addEventListener("click",function(){
-		matterTemplateGui.currentTab.export()
-	});
-
-	container.querySelector(".wireframe-run").addEventListener("click",function(){
-		matterTemplateGui.currentTab.wireframeRun();
-	});
-
-	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
-		matterTemplateGui.currentTab.createPolygonRidgidMethod();
+	matterTemplateGui.selectionTool.selectedObjects.forEach(function(o){
+		transformObject(o, {
+			x: event.movementX,
+			y: event.movementY
+		})
 	});
 
 }
 
+canvas.addEventListener("mousedown", function(){
+
+	if(matterTemplateGui.selectionTool.selectedObjects.length) {
+		canvas.addEventListener("mousemove", transformSelectedObjectsByMouse);
+	}
+
+});
+
+canvas.addEventListener("mouseup", function(){
+	canvas.removeEventListener("mousemove", transformSelectedObjectsByMouse);
+});
+
 let matterTemplateGui = new MatterTemplateGui(document.body);
-MatterTemplateGuiTab.currentInstance = matterTemplateGui.currentTab;
 
 window.matterTemplateGui = matterTemplateGui;

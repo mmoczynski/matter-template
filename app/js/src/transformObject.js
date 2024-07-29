@@ -1,5 +1,3 @@
-
-
 export function transformObject(object, vector) {
     
     // Used for transforming vectors, circles, and any other thing that is defined with a vector
@@ -29,4 +27,3 @@ export function transformObject(object, vector) {
 
 
 }
-
