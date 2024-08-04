@@ -1,4 +1,4 @@
-const MatterTemplate = require("./index");
+const MatterTemplate = require("../index");
 
 console.dir(MatterTemplate.Bodies.create({
 	shape: "circle",

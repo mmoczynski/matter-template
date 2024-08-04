@@ -1,5 +1,5 @@
 if(typeof require === "string") {
-    const MatterTemplate = require(".");
+    const MatterTemplate = require("..");
 }
 
 window.f = new MatterTemplate.Simulations.EngineRunnerRenderTriple({
