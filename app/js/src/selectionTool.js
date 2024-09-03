@@ -72,7 +72,9 @@ function SelectionTool(matterTreeGuiTab) {
 				 * sub-polygons
 				 */ 
 
-				a = decomp.decomp(a);
+				decomp.removeDuplicatePoints(a);
+				decomp.makeCCW(a);
+				a = decomp.quickDecomp(a);
 
 				// Convert back to Matter vector objects from poly-decomp.js vectors.
 
@@ -99,12 +101,11 @@ function SelectionTool(matterTreeGuiTab) {
 				for(let i = 0; i < a.length; i++) {
 					if(Matter.Vertices.contains(a[i], { x: event.x, y: event.y} )) {
 						cond = true;
-						break;
 					}
 				}
 
 				if(cond) {
-					
+
 					alert(o);
 
 					if(event.shiftKey === true) {
