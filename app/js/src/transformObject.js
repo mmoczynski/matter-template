@@ -27,3 +27,18 @@ export function transformObject(object, vector) {
 
 
 }
+
+export function transformObjectX(object, x) {
+    return transformObject(object, {x: x, y: 0});
+}
+
+export function transformObjectY(object, y) {
+    return transformObject(object, {x: 0, y: y});
+}
+
+window.transformObject = transformObject;
+window.transformObjectX = transformObjectX;
+
+export function TransformTool(matterTreeGui) {
+
+}
