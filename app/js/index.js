@@ -7,7 +7,7 @@ import CircleCreator from "./src/circleCreator.js";
 import eventHandler from "./src/eventHandler.js";
 import SelectionTool from "./src/selectionTool.js";
 import { transformObject } from "./src/transformObject.js";
-import { breakApartPolygon } from "./src/breakapart.js";
+import { breakApartPolygon, breakApartSelectedPolygons } from "./src/breakapart.js";
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
@@ -59,6 +59,10 @@ function MatterTemplateGui(container) {
 	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
 		matterTemplateGui.createPolygonRidgidMethod();
 	});
+
+	container.querySelector(".break-apart-poly").addEventListener("click", function() {
+		breakApartSelectedPolygons(matterTemplateGui);
+	})
 
 	// Alternative variable name for this keyword
 	var self = this;

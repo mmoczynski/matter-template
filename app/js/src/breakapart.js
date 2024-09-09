@@ -80,6 +80,14 @@ export function breakApartPolygon(matterTemplateGui, polygon) {
 
 }
 
+export function breakApartSelectedPolygons(matterTemplateGui) {
 
+    matterTemplateGui.selectionTool.selectedObjects.forEach(function(o){
+        if(o.shape === "vertices") {
+            breakApartPolygon(matterTemplateGui, o);
+        }
+    })
+
+}
 
 window.breakApartPolygon = breakApartPolygon;
