@@ -158,15 +158,15 @@ export default function MatterTemplateGui(container) {
 
 				}
 
-				else {
+				if(self.selectionTool.selectedObjects[i].shape === "vertices") {
 
-					for(let j = 0; j < self.selectionTool.selectedObjects[i].length; j++) {
+					for(let j = 0; j < self.selectionTool.selectedObjects[i].vertexSets.length; j++) {
 
 						self.renderer.ctx.beginPath();
 
 						self.renderer.ctx.arc(
-							self.selectionTool.selectedObjects[i][j].x, 
-							self.selectionTool.selectedObjects[i][j].y, 
+							self.selectionTool.selectedObjects[i].vertexSets[j].x, 
+							self.selectionTool.selectedObjects[i].vertexSets[j].y, 
 							3,
 							0,
 							Math.PI *2
