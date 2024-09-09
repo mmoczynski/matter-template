@@ -7,8 +7,7 @@ import CircleCreator from "./src/circleCreator.js";
 import eventHandler from "./src/eventHandler.js";
 import SelectionTool from "./src/selectionTool.js";
 import { transformObject } from "./src/transformObject.js";
-
-window.transformObject = transformObject;
+import { breakApartPolygon } from "./src/breakapart.js";
 
 let canvas = document.createElement("canvas");
 window.canvas = canvas;
@@ -73,7 +72,7 @@ function MatterTemplateGui(container) {
 	this.selectionTool = new SelectionTool(this);
 
 
-	this.shapes = new Proxy([],{
+	/**this.shapes = new Proxy([],{
 
 		set: function(target,string,value) {
 
@@ -89,7 +88,9 @@ function MatterTemplateGui(container) {
 			return target[string] = value;
 		}
 	
-	});
+	});**/
+
+	this.shapes = [];
 	
 	this.newChanges = false;
 
