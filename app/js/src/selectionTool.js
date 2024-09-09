@@ -3,6 +3,8 @@
  * @param {MatterTemplateGuiTab} matterTreeGuiTab 
  */
 
+import { breakApartPolygon, generateConvexSubPolygons } from "./breakapart.js";
+
 
 
 function SelectionTool(matterTreeGuiTab) {
@@ -13,6 +15,8 @@ function SelectionTool(matterTreeGuiTab) {
     this.selectedObjects = [];
 
     matterTreeGuiTab.renderer.canvas.addEventListener("click", function(event){
+
+		if(!event.shiftKey === true) self.selectedObjects = [];
 
 		for(var i = 0; i < matterTreeGuiTab.shapes.length; i++) {
 
@@ -48,53 +52,8 @@ function SelectionTool(matterTreeGuiTab) {
 
             else if(o.shape === "vertices") {
 
-				// Array for holding points and eventually decomposed convex polygons
-				let a = [];
-
-				// Conditonal to tell script if
+				let a = generateConvexSubPolygons(o.vertexSets);
 				let cond = false;
-
-				// Convert matter vectors to poly-decomp.js vectors
-
-				for(let i = 0; i < o.vertexSets.length; i++) {
-
-					a.push([
-						o.vertexSets[i].x,
-						o.vertexSets[i].y
-					]);
-
-				}
-
-				/** 
-				 * Decompose polygon into convex polygons
-				 * 
-				 * At this point, the array referred to with the "a" variable now holds the 
-				 * sub-polygons
-				 */ 
-
-				decomp.removeDuplicatePoints(a);
-				decomp.makeCCW(a);
-				a = decomp.quickDecomp(a);
-
-				// Convert back to Matter vector objects from poly-decomp.js vectors.
-
-				for(let i = 0; i < a.length; i++) {
-
-					let polygon = a[i];
-
-					for(let j = 0; j < polygon.length; j++) {
-
-						let x = polygon[j][0];
-						let y = polygon[j][1];
-
-						polygon[j] = {
-							x: x,
-							y: y
-						}
-
-					}
-
-				}
 
 				// See if point is inside one of the constituient convex polygons
 
