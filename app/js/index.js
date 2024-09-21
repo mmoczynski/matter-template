@@ -5,7 +5,6 @@ import { transformObject } from "./src/transformObject.js";
 import MatterTemplateGui from "./src/matterTemplateGui.js";
 
 let canvas = document.createElement("canvas");
-window.canvas = canvas;
 
 canvas.id = "mattertree-gui-canvas";
 

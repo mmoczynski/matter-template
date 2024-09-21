@@ -14,7 +14,7 @@ function SelectionTool(matterTreeGuiTab) {
     this.matterTreeGuiTab = matterTreeGuiTab;
     this.selectedObjects = [];
 
-    matterTreeGuiTab.renderer.canvas.addEventListener("click", function(event){
+    matterTreeGuiTab.canvas.addEventListener("click", function(event){
 
 		if(!event.shiftKey === true) self.selectedObjects = [];
 

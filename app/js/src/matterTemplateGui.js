@@ -46,9 +46,10 @@ export default function MatterTemplateGui(container) {
 	var self = this;
 
 	this.history = [];
+	this.canvas = container.querySelector("#mattertree-gui-canvas");
 
 	// Renderer
-	this.renderer = new Renderer(canvas);
+	this.renderer = new Renderer(this.canvas);
 
 	// Selection Tool
 	this.selectionTool = new SelectionTool(this);
@@ -77,22 +78,7 @@ export default function MatterTemplateGui(container) {
 	this.newChanges = false;
 
 	// Polygon Creator
-
-	let polygonCreator = new PolygonCreator(canvas);
-
-	this.polygonCreator = polygonCreator;
-
-	polygonCreator.on("definePolygon",function(event){
-
-		let c = Matter.Vertices.centre(event.vertices);
-
-		matterTemplateGui.shapes.push({
-			vertexSets: JSON.parse(JSON.stringify(event.vertices)),
-			shape: "vertices",
-			x: c.x,
-			y: c.y
-		});
-	});
+	this.polygonCreator = new PolygonCreator(this);
 
 	// Circle Creator
 	this.circleCreator = new CircleCreator(this);

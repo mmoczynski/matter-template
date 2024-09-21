@@ -1,12 +1,10 @@
-import EventHandler from "./eventHandler.js";
-
 /**
  * @constructor
- * @param {HTMLElement} canvas
+ * @param {MatterTemplateGui} matterTemplateGui
  * 
  */
 
- function PolygonCreator(canvas) {
+ function PolygonCreator(matterTemplateGui) {
 
 	let self = this;
 
@@ -29,7 +27,7 @@ import EventHandler from "./eventHandler.js";
 	 * @type {HTMLElement}
 	 */
 
-	this.canvas = canvas;
+	this.matterTemplateGui = matterTemplateGui;
 
 	/**
 	 * String defining trigger for HTML Event
@@ -39,13 +37,6 @@ import EventHandler from "./eventHandler.js";
 	this.firstEventStr = "click";
 	this.secondEventStr = "dblclick";
 
-	this.eventArrays = {
-		definePolygon: [],
-		pushVector: [],
-		disable: [],
-		enable: []
-	};
-
 	this.addVectorByMouseEvent = function(event) {
 		let v = {
 			x: event.offsetX - self.delta.x,
@@ -54,54 +45,32 @@ import EventHandler from "./eventHandler.js";
 
 		polygonDefiner.vertices.push(v);
 
-		polygonDefiner.callEvent("pushVector", {
-			vector: v,
-		});
 	}
 
-	this.definePolygonByMouseEvent = function () {
-		polygonDefiner.callEvent("definePolygon", {
-			vertices: polygonDefiner.vertices,
+	this.definePolygonByMouseEvent = function() {
+
+		let c = Matter.Vertices.centre(polygonDefiner.vertices);
+
+		matterTemplateGui.shapes.push({
+			vertexSets: JSON.parse(JSON.stringify(polygonDefiner.vertices)),
+			shape: "vertices",
+			x: c.x,
+			y: c.y
 		});
 
 		polygonDefiner.vertices = [];
 	}
 
-    Object.assign(this,EventHandler);
-
-	// this.on("pushVector",function(event){
-	// 	alert("Vector: " + JSON.stringify(event));
-	// });
-
-	this.on("definePolygon",function(event){
-		
-	});
-
 }
 
 PolygonCreator.prototype.enable = function() {
-
-	this.canvas.addEventListener(this.firstEventStr, this.addVectorByMouseEvent);
-	this.canvas.addEventListener(this.secondEventStr, this.definePolygonByMouseEvent);
-	
-	this.callEvent("enable", {
-		targetElement: this.canvas,
-		firstEventStr: this.firstEventStr,
-		secondEventStr: this.secondEventStr
-	});
+	this.matterTemplateGui.canvas.addEventListener(this.firstEventStr, this.addVectorByMouseEvent);
+	this.matterTemplateGui.canvas.addEventListener(this.secondEventStr, this.definePolygonByMouseEvent);
 }
 
 PolygonCreator.prototype.disable = function() {
-	
-	this.canvas.removeEventListener(this.firstEventStr, this.addVectorByMouseEvent);
-	this.canvas.removeEventListener(this.secondEventStr, this.definePolygonByMouseEvent);
-
-	this.callEvent("disable", {
-		targetElement: this.canvas,
-		firstEventStr: this.firstEventStr,
-		secondEventStr: this.secondEventStr
-	});
-
+	this.matterTemplateGui.canvas.removeEventListener(this.firstEventStr, this.addVectorByMouseEvent);
+	this.matterTemplateGui.canvas.removeEventListener(this.secondEventStr, this.definePolygonByMouseEvent);
 }
 
 export default PolygonCreator;
