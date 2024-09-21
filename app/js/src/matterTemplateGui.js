@@ -1,7 +1,7 @@
-import PolygonCreator from "./polygonCreator.js";
+import PolygonCreator from "./mousetools/polygonCreator.js";
 import Renderer from "./render.js";
 import MatterTemplateGuiTool from "./matterTemplateGuiTool.js";
-import CircleCreator from "./circleCreator.js";
+import CircleCreator from "./mousetools/circleCreator.js";
 import SelectionTool from "./selectionTool.js";
 import { breakApartPolygon, breakApartSelectedPolygons } from "./breakapart.js";
 
