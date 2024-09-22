@@ -1,12 +1,21 @@
-import MatterTemplateGui from "./matterTemplateGui.js";
+export default function WireframeRun(matterTemplateGui) {
 
-MatterTemplateGui.prototype.wireframeRun = function() {
+    let self = this;
+
+    this.matterTemplateGui = matterTemplateGui;
+
+    matterTemplateGui.container.querySelector(".wireframe-run").addEventListener("click",function(){
+		self.run();
+	});
+}
+
+WireframeRun.prototype.run = function() {
 
 	let interval_id;
 
-	let self = this;
+	var matterTemplateGui = this.matterTemplateGui;
 
-	this.playing = true;
+	matterTemplateGui.playing = true;
 
 	let toggle = document.createElement("span");
 	let reset = document.createElement("span");
@@ -19,14 +28,14 @@ MatterTemplateGui.prototype.wireframeRun = function() {
 	let tools = document.createElement("span");
 	tools.className = "ctrl-tools";
 	tools.append(toggle,reset,exit);
-	this.container.appendChild(tools);
+	matterTemplateGui.container.appendChild(tools);
 
-	window.s = MatterTemplate.Engine.create(this.shapes);
+	window.s = MatterTemplate.Engine.create(matterTemplateGui.shapes);
 
 
 	toggle.addEventListener("click",function(){
 
-		if(self.playing) {
+		if(matterTemplateGui.playing) {
 			toggle.classList.remove("bi-pause-fill");
 			toggle.classList.add("bi-play-fill");
 		}
@@ -36,22 +45,22 @@ MatterTemplateGui.prototype.wireframeRun = function() {
 			toggle.classList.add("bi-pause-fill");
 		}
 
-		self.playing = !self.playing;
+		matterTemplateGui.playing = !matterTemplateGui.playing;
 
 	});
 
 
 	reset.addEventListener("click",function(){
 		Matter.Composite.clear(window.s.world,true,true);
-		window.s = MatterTemplate.Engine.create(self.shapes);
+		window.s = MatterTemplate.Engine.create(matterTemplateGui.shapes);
 	});
 
 	exit.addEventListener("click",function(){
-		self.playing = false;
+		matterTemplateGui.playing = false;
 		Matter.Composite.clear(window.s.world,true,true);
 		window.s = null;
 		//self.renderer.renderWorld(self.shapes);
-		self.container.removeChild(tools);
+		matterTemplateGui.container.removeChild(tools);
 	});
 
 }

@@ -5,14 +5,17 @@ import CircleCreator from "./mousetools/circleCreator.js";
 import SelectionTool from "./selectionTool.js";
 import { breakApartPolygon, breakApartSelectedPolygons } from "./breakapart.js";
 import ContextMenu from "./gui/contextMenu.js";
+import ObjectRemover from "./deleteObject.js";
+import WireframeRun from "./wireframeRun.js";
+
 
 export default function MatterTemplateGui(container) {
 
 	this.container = container;
-
 	let matterTemplateGui = this;
-
+	this.objectRemover = new ObjectRemover(this);
 	this.contextMenu = new ContextMenu(this);
+	this.wireframeRun = new WireframeRun(this);
 
 	// Toolbar
 
@@ -30,10 +33,6 @@ export default function MatterTemplateGui(container) {
 
 	container.querySelector(".action-export").addEventListener("click",function(){
 		matterTemplateGui.export()
-	});
-
-	container.querySelector(".wireframe-run").addEventListener("click",function(){
-		matterTemplateGui.wireframeRun();
 	});
 
 	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){

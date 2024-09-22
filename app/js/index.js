@@ -4,8 +4,6 @@ import eventHandler from "./src/eventHandler.js";
 import { transformObject } from "./src/transformObject.js";
 import MatterTemplateGui from "./src/matterTemplateGui.js";
 
-import "./src/wireframeRun.js";
-
 import "./src/file/open.js";
 import "./src/file/save.js";
 import "./src/file/new.js";
