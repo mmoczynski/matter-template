@@ -53,12 +53,6 @@ MatterTemplateGui.prototype.generateVertexCode = function() {
 	return txt;
 }
 
-MatterTemplateGui.prototype.createPolygonRidgidMethod = function() {
-	let self = this;
-}
-
-
-
 // Attach events
 Object.assign(MatterTemplateGui.prototype,eventHandler);
 
