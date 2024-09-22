@@ -70,4 +70,11 @@ ContextMenu.prototype.create = function(x, y) {
     lock.classList.add("list-group-item");
     contextMenu.appendChild(lock);
 
+    // Object editor
+
+    let objectEditor = document.createElement("li");
+    objectEditor.innerText = "Open Object Editor";
+    objectEditor.classList.add("list-group-item");
+    contextMenu.appendChild(objectEditor);
+
 }
