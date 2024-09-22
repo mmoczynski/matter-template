@@ -4,6 +4,7 @@ import MatterTemplateGuiTool from "./matterTemplateGuiTool.js";
 import CircleCreator from "./mousetools/circleCreator.js";
 import SelectionTool from "./selectionTool.js";
 import { breakApartPolygon, breakApartSelectedPolygons } from "./breakapart.js";
+import ContextMenu from "./gui/contextMenu.js";
 
 export default function MatterTemplateGui(container) {
 
@@ -11,6 +12,7 @@ export default function MatterTemplateGui(container) {
 
 	let matterTemplateGui = this;
 
+	this.contextMenu = new ContextMenu(this);
 
 	// Toolbar
 
