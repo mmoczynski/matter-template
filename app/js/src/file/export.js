@@ -1,6 +1,4 @@
-import MatterTemplateGui from "../matterTemplateGui.js";
-
-MatterTemplateGui.prototype.export = function() {
+export default function exportFile() {
 
 	let self = this;
 

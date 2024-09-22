@@ -8,6 +8,11 @@ import ContextMenu from "./gui/contextMenu.js";
 import ObjectRemover from "./deleteObject.js";
 import WireframeRun from "./wireframeRun.js";
 
+import save from "./file/save.js";
+import open from "./file/open.js";
+import newFile from "./file/new.js";
+import exportFile from "./file/export.js";
+
 
 export default function MatterTemplateGui(container) {
 
@@ -28,11 +33,11 @@ export default function MatterTemplateGui(container) {
 	});
 
 	container.querySelector(".action-new-file").addEventListener("click",function(){
-		matterTemplateGui.new()
+		matterTemplateGui.newFile()
 	});
 
 	container.querySelector(".action-export").addEventListener("click",function(){
-		matterTemplateGui.export()
+		matterTemplateGui.exportFile()
 	});
 
 	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
@@ -54,25 +59,6 @@ export default function MatterTemplateGui(container) {
 
 	// Selection Tool
 	this.selectionTool = new SelectionTool(this);
-
-
-	/**this.shapes = new Proxy([],{
-
-		set: function(target,string,value) {
-
-			matterTemplateGui.newChanges = true;
-			
-			matterTemplateGui.history.push({
-				target: target,
-				property: string,
-				newValue: value,
-				oldValue: target[string]
-			});
-	
-			return target[string] = value;
-		}
-	
-	});**/
 
 	this.shapes = [];
 	
@@ -192,3 +178,8 @@ export default function MatterTemplateGui(container) {
 	},16.666);
 
 }
+
+MatterTemplateGui.prototype.save = save;
+MatterTemplateGui.prototype.open = open;
+MatterTemplateGui.prototype.newFile = newFile;
+MatterTemplateGui.prototype.exportFile = exportFile;

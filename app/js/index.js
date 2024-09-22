@@ -5,9 +5,9 @@ import { transformObject } from "./src/transformObject.js";
 import MatterTemplateGui from "./src/matterTemplateGui.js";
 
 import "./src/file/open.js";
-import "./src/file/save.js";
 import "./src/file/new.js";
 import "./src/file/export.js";
+import "./src/file/save.js";
 
 import "./src/delta.js";
 

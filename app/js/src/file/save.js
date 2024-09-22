@@ -1,6 +1,8 @@
-import MatterTemplateGui from "../matterTemplateGui.js";
+/**
+ * @this {MatterTemplateGui}
+ */
 
-MatterTemplateGui.prototype.save = function() {
+export default function save() {
 
 	let self = this;
 
