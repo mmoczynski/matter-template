@@ -64,6 +64,25 @@
 }
 
 PolygonCreator.prototype.enable = function() {
+
+	let self = this;
+
+	let reset = document.createElement("span");
+	let exit = document.createElement("span");
+
+	exit.addEventListener("click",function(){
+		self.matterTemplateGui.polygonCreator.disable();
+		self.matterTemplateGui.container.removeChild(tools);
+	});
+
+	reset.className = "bi bi-arrow-clockwise reset-button ctrl-button";
+	exit.className = "bi bi-x exit-button ctrl-button";
+
+	let tools = document.createElement("span");
+	tools.className = "ctrl-tools";
+	tools.append(reset,exit);
+	this.matterTemplateGui.container.appendChild(tools);
+
 	this.matterTemplateGui.canvas.addEventListener(this.firstEventStr, this.addVectorByMouseEvent);
 	this.matterTemplateGui.canvas.addEventListener(this.secondEventStr, this.definePolygonByMouseEvent);
 }

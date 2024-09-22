@@ -35,7 +35,7 @@ export default function MatterTemplateGui(container) {
 	});
 
 	container.querySelector(".rigid-polygon-creation").addEventListener("click",function(){
-		matterTemplateGui.createPolygonRidgidMethod();
+		matterTemplateGui.polygonCreator.enable();
 	});
 
 	container.querySelector(".break-apart-poly").addEventListener("click", function() {
