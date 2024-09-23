@@ -12,6 +12,9 @@ import save from "./file/save.js";
 import open from "./file/open.js";
 import newFile from "./file/new.js";
 import exportFile from "./file/export.js";
+import ObjectEditorHandler from "./gui/objectEditor.js";
+import VertexSetsUnionTool from "./vertexSetsUnion.js";
+import StaticObjectSetter from "./gui/staticObjectSetter.js";
 
 
 export default function MatterTemplateGui(container) {
@@ -21,6 +24,9 @@ export default function MatterTemplateGui(container) {
 	this.objectRemover = new ObjectRemover(this);
 	this.contextMenu = new ContextMenu(this);
 	this.wireframeRun = new WireframeRun(this);
+	this.objectEditorHandler = new ObjectEditorHandler(this);
+	this.vertexSetsUnion = new VertexSetsUnionTool(this);
+	this.staticObjectSetter = new StaticObjectSetter(this);
 
 	// Toolbar
 
@@ -163,9 +169,9 @@ export default function MatterTemplateGui(container) {
 
 		if(self.playing) {
 
-			Matter.Engine.update(window.s);
+			Matter.Engine.update(self.simulation);
 
-			window.s.world.bodies.forEach(function(o){
+			self.simulation.world.bodies.forEach(function(o){
 	
 				o.parts.forEach(function(p){
 					self.renderer.renderVertices(p.vertices)
