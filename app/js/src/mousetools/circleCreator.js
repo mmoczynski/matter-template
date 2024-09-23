@@ -79,10 +79,19 @@ CircleCreator.prototype.enable = function() {
         else if(self.center && self.secondPoint) {
     
             self.matterTemplateGui.shapes.push({
+
                 x: self.center.x,
                 y: self.center.y,
                 radius: self.getRadius(),
-                shape: "circle"
+                shape: "circle",
+
+                plugin: {
+                    matterTemplate: {
+                        
+                    }
+                }
+
+
             })
     
             self.center = undefined;

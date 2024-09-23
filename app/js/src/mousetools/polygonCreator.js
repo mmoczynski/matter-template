@@ -51,11 +51,31 @@
 
 		let c = Matter.Vertices.centre(polygonDefiner.vertices);
 
+		// Used to remove duplicate points
+
+		for(let i = 0; i < polygonDefiner.vertices.length; i++) {
+			for(let j = 0; j < polygonDefiner.vertices.length; j++) {
+
+				let sameX = (polygonDefiner.vertices[i].x === polygonDefiner.vertices[j].x) 
+				let sameY = (polygonDefiner.vertices[i].y === polygonDefiner.vertices[j].y) 
+
+				if(i !== j && sameX && sameY) {
+					polygonDefiner.vertices.splice(j, 1);
+				}
+			}
+		}
+
 		matterTemplateGui.shapes.push({
+
 			vertexSets: JSON.parse(JSON.stringify(polygonDefiner.vertices)),
 			shape: "vertices",
 			x: c.x,
-			y: c.y
+			y: c.y,
+
+			plugin: {
+				matterTemplate: {}
+			}
+
 		});
 
 		polygonDefiner.vertices = [];
