@@ -45,6 +45,8 @@ Renderer.prototype.renderWorld = function(worldArray) {
 
     this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 
+    let self = this;
+
     for(let i = 0; i < worldArray.length; i++) {
 
         if(worldArray[i].shape === "circle") {
@@ -52,7 +54,15 @@ Renderer.prototype.renderWorld = function(worldArray) {
         }
 
         if(worldArray[i].shape === "vertices") {
-            this.renderVertices(worldArray[i].vertexSets);
+
+            if(Array.isArray(worldArray[i].vertexSets[0])) {
+                worldArray[i].vertexSets.forEach(o => self.renderVertices(o))
+            }
+
+            else {
+                this.renderVertices(worldArray[i].vertexSets);
+            }
+
         }
         
 
