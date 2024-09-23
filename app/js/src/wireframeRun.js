@@ -30,7 +30,7 @@ WireframeRun.prototype.run = function() {
 	tools.append(toggle,reset,exit);
 	matterTemplateGui.container.appendChild(tools);
 
-	window.s = MatterTemplate.Engine.create(matterTemplateGui.shapes);
+    matterTemplateGui.simulation = MatterTemplate.Engine.create(matterTemplateGui.shapes)
 
 
 	toggle.addEventListener("click",function(){
@@ -51,14 +51,14 @@ WireframeRun.prototype.run = function() {
 
 
 	reset.addEventListener("click",function(){
-		Matter.Composite.clear(window.s.world,true,true);
-		window.s = MatterTemplate.Engine.create(matterTemplateGui.shapes);
+		Matter.Composite.clear(matterTemplateGui.simulation.world,true,true);
+		matterTemplateGui.simulation = MatterTemplate.Engine.create(matterTemplateGui.shapes);
 	});
 
 	exit.addEventListener("click",function(){
 		matterTemplateGui.playing = false;
-		Matter.Composite.clear(window.s.world,true,true);
-		window.s = null;
+		Matter.Composite.clear(matterTemplateGui.simulation.world,true,true);
+		matterTemplateGui.simulation = null;
 		//self.renderer.renderWorld(self.shapes);
 		matterTemplateGui.container.removeChild(tools);
 	});

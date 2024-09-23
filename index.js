@@ -88,23 +88,13 @@ const MatterTemplate = {
 		
 		create: function(bodyTemplate) {
 
-            // Set body template
+            let o;
 
-            let options = bodyTemplate.options || { 
-                plugin: {
-                    matterTemplate: {}
-                } 
-            }
-
-            options.plugin.matterTemplate = {
-                template: bodyTemplate
-            };
-
-
+            let options = bodyTemplate.options || {}
 
 			if(bodyTemplate.shape === "circle") {
 
-				return Matter.Bodies.circle(
+				o = Matter.Bodies.circle(
 					bodyTemplate.x,
 					bodyTemplate.y,
 					bodyTemplate.radius,
@@ -115,7 +105,7 @@ const MatterTemplate = {
 
 			if(bodyTemplate.shape === "rectangle") {
 
-				return Matter.Bodies.rectangle(
+				o = Matter.Bodies.rectangle(
 					bodyTemplate.x,
 					bodyTemplate.y,
 					bodyTemplate.width,
@@ -126,7 +116,7 @@ const MatterTemplate = {
 			}
 
 			if(bodyTemplate.shape === "polygon") {
-				return Matter.Bodies.polygon(
+				o = Matter.Bodies.polygon(
 					bodyTemplate.x,
 					bodyTemplate.y,
 					bodyTemplate.sides,
@@ -137,9 +127,21 @@ const MatterTemplate = {
 
 			if(bodyTemplate.shape === "vertices") {
 
-				return Matter.Bodies.fromVertices(
-					bodyTemplate.x,
-					bodyTemplate.y,
+                let x = bodyTemplate.x;
+                let y = bodyTemplate.y;
+
+                if(x === undefined && y === undefined) {
+
+                    let c = Matter.Vertices.centre(bodyTemplate.vertexSets);
+
+                    x = c.x;
+                    y = c.y;
+                    
+                }
+
+				o = Matter.Bodies.fromVertices(
+					x,
+					y,
 					bodyTemplate.vertexSets,
 					options,
 					bodyTemplate.flagInternal,
@@ -154,7 +156,7 @@ const MatterTemplate = {
 
                 let c = Matter.Vertices.centre(bodyTemplate);
 
-                return MatterTemplate.Bodies.create({
+                o = MatterTemplate.Bodies.create({
                     shape: "vertices",
                     x: c.x,
                     y: c.y,
@@ -165,7 +167,7 @@ const MatterTemplate = {
 
             if(typeof bodyTemplate === "string") {
                 
-                return MatterTemplate.Bodies.create(bodyTemplate.split(" ").map(
+                o = MatterTemplate.Bodies.create(bodyTemplate.split(" ").map(
                     
                     function(o) {
 
@@ -183,6 +185,18 @@ const MatterTemplate = {
                 
 
             }
+
+            // Set body template
+
+            o.plugin = o.plugin || {}
+            o.plugin.matterTemplate = o.plugin.matterTemplate || {}
+            o.plugin.matterTemplate.bodyTemplate = bodyTemplate;
+
+            if(bodyTemplate?.plugin?.matterTemplate.static) {
+                Matter.Body.setStatic(o, true)
+            }
+
+            return o;
 
 		}
 
