@@ -65,10 +65,7 @@ ContextMenu.prototype.create = function(x, y) {
 
     // Lock/Unlock object
 
-    let lock = document.createElement("li");
-    lock.innerText = "Lock item";
-    lock.classList.add("list-group-item");
-    contextMenu.appendChild(lock);
+    this.addLockToggleButton();
 
     // Object editor
 
@@ -77,4 +74,13 @@ ContextMenu.prototype.create = function(x, y) {
     objectEditor.classList.add("list-group-item");
     contextMenu.appendChild(objectEditor);
 
+}
+
+ContextMenu.prototype.addLockToggleButton = function() {
+    
+    let lock = document.createElement("li");
+    lock.innerText = "Lock item";
+    lock.classList.add("list-group-item");
+
+    this.contextMenu.appendChild(lock);
 }
