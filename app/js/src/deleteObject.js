@@ -5,6 +5,12 @@ export default function ObjectRemover(matterTemplateGui) {
      */
 
     this.matterTemplateGui = matterTemplateGui;
+
+    let self = this;
+
+    matterTemplateGui.container.querySelector(".dropdown-item.delete-selected-objects").addEventListener("click", function(){
+        matterTemplateGui.selectionTool.selectedObjects.forEach(o => self.delete(o));
+    });
 }
 
 ObjectRemover.prototype.delete = function(o) {
