@@ -20,6 +20,7 @@ body, html {
 
 .modal {
     --bs-modal-bg: #333;
+    background: rgba(0, 0, 0, 0.6);
 }
 
 .ctrl-button {
